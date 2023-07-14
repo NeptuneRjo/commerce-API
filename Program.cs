@@ -1,7 +1,19 @@
+using CommerceClone.Data;
+using CommerceClone.Interfaces;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
+var services = builder.Services;
 
 // Add services to the container.
-builder.Services.AddControllersWithViews();
+services.AddControllersWithViews();
+
+services.AddScoped<IDataContext, DataContext>();
+
+services.AddDbContext<DataContext>(options =>
+{
+    options.UseInMemoryDatabase("Commerce");
+});
 
 var app = builder.Build();
 
