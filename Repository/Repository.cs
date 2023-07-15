@@ -1,8 +1,11 @@
 ﻿using CommerceClone.Interfaces;
-using Microsoft.EntityFrameworkCore;
 
 namespace CommerceClone.Repository
 {
+    /// <summary>
+    /// Defines generic repository CRUD behaviors
+    /// </summary>
+    /// <typeparam name="TEntity"></typeparam>
     public class Repository<TEntity> : IRepository<TEntity> where TEntity : class
     {
         private readonly IDataContext _context;
