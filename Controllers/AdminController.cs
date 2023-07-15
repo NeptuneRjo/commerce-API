@@ -13,19 +13,19 @@ namespace CommerceClone.Controllers
             _repository = adminRepository;
         }
 
-        [HttpPost("~/api/admin/create")]
-        public void InsertAdmin(Admin admin)
+        [HttpPost]
+        public void Create(Admin admin)
         {
             _repository.Add(admin);
         }
 
-        [HttpGet("~/api/admin/all")]
-        public ICollection<Admin> GetAllAdmins()
+        [HttpGet]
+        public ICollection<Admin> AllAdmins()
         {
             return _repository.GetAll();
         }
 
-        [HttpGet("~/api/admin/{query}")]
+        [HttpGet]
         public Admin GetAdmin(string query)
         {
             if (Int32.TryParse(query, out int i)) {
@@ -35,16 +35,16 @@ namespace CommerceClone.Controllers
             return _repository.GetAdminByUsername(query);
         }
 
-        [HttpPatch("~/api/admin/update")]
+        [HttpPatch]
         public void UpdateAdmin(Admin admin)
         {
             _repository.Update(admin);
         }
 
-        [HttpDelete("~/api/admin/delete")]
-        public void DeleteAdmin(Admin admin)
+        [HttpDelete]
+        public void DeleteAdmin(int id)
         {
-            _repository.Delete(admin);
+            _repository.Delete(id);
         }
     }
 }
