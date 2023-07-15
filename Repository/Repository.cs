@@ -25,7 +25,7 @@ namespace CommerceClone.Repository
             _context.Set<TEntity>().AddRange(entities);
         }
 
-        public IEnumerable<TEntity> GetAll()
+        public ICollection<TEntity> GetAll()
         {
             return _context.Set<TEntity>().ToList();
         }
