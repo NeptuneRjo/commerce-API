@@ -6,21 +6,14 @@ namespace CommerceClone.Data
 {
     public class DataContext : DbContext, IDataContext
     {
-
         public DataContext() { }
-
         public DataContext(DbContextOptions<DataContext> options) : base(options) { }
 
-        public DbSet<Admin> Admins { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public DbSet<Cart> Carts { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public DbSet<Item> Items { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public DbSet<Store> Stores { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public DbSet<User> Users { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-
-        public int SaveChanges()
-        {
-            throw new NotImplementedException();
-        }
+        public DbSet<Admin> Admins { get; set; }
+        public DbSet<Cart> Carts { get; set; }
+        public DbSet<Item> Items { get; set; }
+        public DbSet<Store> Stores { get; set; }
+        public DbSet<User> Users { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
