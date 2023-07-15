@@ -12,11 +12,9 @@ namespace CommerceClone.Repository
             _context = context;
         }
 
-        public ICollection<Item> GetItemByName(string name)
+        public Item GetItemByName(string name)
         {
-            return _context.Items
-                .Where(c => c.Name == name)
-                .ToList();
+            return _context.Items.Find(name);
         }
     }
 }

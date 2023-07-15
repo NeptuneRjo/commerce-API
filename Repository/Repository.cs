@@ -40,8 +40,10 @@ namespace CommerceClone.Repository
             _context.Set<TEntity>().Update(entity);
         }
 
-        public void Delete(TEntity entity)
+        public void Delete(int id)
         {
+            var entity = _context.Set<TEntity>().Find(id);
+
             _context.Set<TEntity>().Remove(entity);
         }
     }

@@ -1,18 +1,24 @@
 using CommerceClone.Data;
 using CommerceClone.Interfaces;
+using CommerceClone.Repository;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
-var services = builder.Services;
+IServiceCollection services = builder.Services;
 
 // Add services to the container.
 services.AddControllersWithViews();
 
+services.AddScoped<IAdminRepository, AdminRepository>();
+services.AddScoped<ICartRepository, CartRepository>();
+services.AddScoped<IItemRepository, ItemRepository>();
+services.AddScoped<IStoreRepository, StoreRepository>();
+services.AddScoped<IUserRepository, UserRepository>();
 services.AddScoped<IDataContext, DataContext>();
 
 services.AddDbContext<DataContext>(options =>
 {
-    options.UseInMemoryDatabase("Commerce");
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
 var app = builder.Build();

@@ -12,7 +12,7 @@ namespace CommerceClone.Repository
             _context = context;
         }
 
-        public Cart GetCartByUser(User user)
+        public Cart GetCartByUser(string user)
         {
             return _context.Carts.Find(user);
         }

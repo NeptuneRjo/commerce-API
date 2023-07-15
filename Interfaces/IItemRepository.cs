@@ -4,6 +4,6 @@ namespace CommerceClone.Interfaces
 {
     public interface IItemRepository
     {
-        ICollection<Item> GetItemByName(string name);
+        Item GetItemByName(string name);
     }
 }
