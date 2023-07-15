@@ -12,5 +12,6 @@ namespace CommerceClone.Interfaces
         DbSet<User> Users { get; set; }
 
         int SaveChanges();
+        DbSet<TEntity> Set<TEntity>() where TEntity : class;
     }
 }
