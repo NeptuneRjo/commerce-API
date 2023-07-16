@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CommerceClone.Controllers
 {
-    public class AdminController : Controller
+    public class AdminController : ControllerBase
     {
         private AdminRepository _repository;
 
@@ -14,37 +14,70 @@ namespace CommerceClone.Controllers
         }
 
         [HttpPost]
-        public void Create(Admin admin)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public ActionResult Create(Admin admin)
         {
-            _repository.Add(admin);
-        }
-
-        [HttpGet]
-        public ICollection<Admin> AllAdmins()
-        {
-            return _repository.GetAll();
-        }
-
-        [HttpGet]
-        public Admin GetAdmin(string query)
-        {
-            if (Int32.TryParse(query, out int i)) {
-                return _repository.GetById(i);
+            try
+            {
+                _repository.Add(admin);
+                return Ok();
             }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
 
-            return _repository.GetAdminByUsername(query);
+        [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public ActionResult<Admin> GetAdmin(string query)
+        {
+            try
+            {
+                if (Int32.TryParse(query, out int i))
+                    return Ok(_repository.GetById(i));
+                
+
+                return Ok(_repository.GetAdminByUsername(query));
+            }
+            catch (Exception ex)
+            {
+                return NotFound(ex.Message);
+            }
         }
 
         [HttpPatch]
-        public void UpdateAdmin(Admin admin)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public ActionResult UpdateAdmin(Admin admin)
         {
-            _repository.Update(admin);
+            try
+            {
+                _repository.Update(admin);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpDelete]
-        public void DeleteAdmin(int id)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public ActionResult DeleteAdmin(int id)
         {
-            _repository.Delete(id);
+            try
+            {
+                _repository.Delete(id);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }

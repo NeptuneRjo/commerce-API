@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CommerceClone.Controllers
 {
-    public class CartController : Controller
+    public class CartController : ControllerBase
     {
         private readonly CartRepository _repository;
 
@@ -14,31 +14,69 @@ namespace CommerceClone.Controllers
         }
 
         [HttpPost]
-        public void Create(Cart cart)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public ActionResult Create(Cart cart)
         {
-            _repository.Add(cart);
+            try
+            {
+                _repository.Add(cart);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpGet]
-        public Cart GetCart(string query)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public ActionResult<Cart> GetCart(string query)
         {
-            if (Int32.TryParse(query, out int i)) {
-                return _repository.GetById(i);
+            try
+            {
+                if (Int32.TryParse(query, out int i))
+                    return Ok(_repository.GetById(i));
+                
+                return Ok(_repository.GetCartByUser(query));
             }
-
-            return _repository.GetCartByUser(query);
+            catch (Exception ex)
+            {
+                return NotFound(ex.Message);
+            }
         }
 
         [HttpPatch]
-        public void UpdateCart(Cart cart)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public ActionResult UpdateCart(Cart cart)
         {
-            _repository.Update(cart);
+            try
+            {
+                _repository.Update(cart);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpDelete]
-        public void DeleteCart(int id) 
-        { 
-            _repository.Delete(id);
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public ActionResult DeleteCart(int id) 
+        {
+            try
+            {
+                _repository.Delete(id);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }

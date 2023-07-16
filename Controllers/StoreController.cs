@@ -14,33 +14,81 @@ namespace CommerceClone.Controllers
         }
 
         [HttpPost]
-        public void Create(Store store)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public ActionResult Create(Store store)
         {
-            _repository.Add(store);
+            try
+            {
+                _repository.Add(store);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpGet]
-        public ICollection<Store> AllStores()
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public ActionResult<ICollection<Store>> AllStores()
         {
-            return _repository.GetAll();
+            try
+            {
+                return Ok(_repository.GetAll());
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpGet]
-        public Store Store(int id)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public ActionResult<Store> GetStore(int id)
         {
-            return _repository.GetById(id);
+            try
+            {
+                return Ok(_repository.GetById(id));
+            }
+            catch (Exception ex)
+            {
+                return NotFound(ex.Message);
+            }
         }
 
         [HttpPatch]
-        public void Update(Store store)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public ActionResult Update(Store store)
         {
-            _repository.Update(store);
+            try
+            {
+                _repository.Update(store);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpDelete]
-        public void Delete(int id) 
-        { 
-            _repository.Delete(id);
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public ActionResult Delete(int id) 
+        {
+            try
+            {
+                _repository.Delete(id);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }

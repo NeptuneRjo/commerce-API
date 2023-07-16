@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CommerceClone.Controllers
 {
-    public class ItemController : Controller
+    public class ItemController : ControllerBase
     {
         private readonly ItemRepository _repository;
 
@@ -14,38 +14,86 @@ namespace CommerceClone.Controllers
         }
 
         [HttpPost]
-        public void Create(Item item)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public ActionResult Create(Item item)
         {
-            _repository.Add(item);
-        }
-
-        [HttpGet]
-        public ICollection<Item> AllItems()
-        {
-            return _repository.GetAll();
-        }
-
-        [HttpGet]
-        public Item GetItem(string query)
-        {
-            if (Int32.TryParse(query, out int i))
+            try
             {
-                return _repository.GetById(i);
+                _repository.Add(item);
+                return Ok();
             }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
 
-            return _repository.GetItemByName(query);
+        [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public ActionResult<ICollection<Item>> AllItems()
+        {
+            try
+            {
+                return Ok(_repository.GetAll());
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public ActionResult<Item> GetItem(string query)
+        {
+            try
+            {
+                if (Int32.TryParse(query, out int i))
+                    return Ok(_repository.GetById(i));
+                
+
+                return Ok(_repository.GetItemByName(query));
+            }
+            catch (Exception ex)
+            {
+                return NotFound(ex.Message);
+            }
         }
 
         [HttpPatch]
-        public void Update(Item item)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public ActionResult Update(Item item)
         {
-            _repository.Update(item);
+            try
+            {
+                _repository.Update(item);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpDelete]
-        public void DeleteItem(int id) 
-        { 
-            _repository.Delete(id);
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public ActionResult DeleteItem(int id) 
+        {
+            try
+            {
+                _repository.Delete(id);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }
