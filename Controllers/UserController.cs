@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CommerceClone.Controllers
 {
+    [ApiController]
+    [Route("api/[controller]/[action]/{query?}")]
     public class UserController : ControllerBase
     {
         private readonly UserRepository _repository;
@@ -33,7 +35,7 @@ namespace CommerceClone.Controllers
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public ActionResult<ICollection<User>> GetAll()
+        public ActionResult<ICollection<User>> All()
         {
             try
             {
@@ -48,7 +50,7 @@ namespace CommerceClone.Controllers
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public ActionResult<User> GetUser(string query) 
+        public ActionResult<User> Get(string query) 
         {
             try
             {
@@ -69,11 +71,11 @@ namespace CommerceClone.Controllers
         [HttpPatch]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public ActionResult Update(User user) 
+        public ActionResult Update(int query, User user) 
         {
             try
             {
-                _repository.Update(user);
+                _repository.Update(query, user);
                 return Ok();
             }
             catch (Exception ex)
@@ -83,9 +85,19 @@ namespace CommerceClone.Controllers
         }
 
         [HttpDelete]
-        public void Delete(int id)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public ActionResult Delete(int query)
         {
-            _repository.Delete(id);
+            try
+            {
+                _repository.Delete(query);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }

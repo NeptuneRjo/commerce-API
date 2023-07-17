@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CommerceClone.Controllers
 {
+    [ApiController]
+    [Route("api/[controller]/[action]/{query?}")]
     public class CartController : ControllerBase
     {
         private readonly CartRepository _repository;
@@ -32,7 +34,7 @@ namespace CommerceClone.Controllers
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public ActionResult<Cart> GetCart(string query)
+        public ActionResult<Cart> Get(string query)
         {
             try
             {
@@ -50,11 +52,11 @@ namespace CommerceClone.Controllers
         [HttpPatch]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public ActionResult UpdateCart(Cart cart)
+        public ActionResult Update(int query, Cart cart)
         {
             try
             {
-                _repository.Update(cart);
+                _repository.Update(query, cart);
                 return Ok();
             }
             catch (Exception ex)
@@ -66,11 +68,11 @@ namespace CommerceClone.Controllers
         [HttpDelete]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public ActionResult DeleteCart(int id) 
+        public ActionResult Delete(int query) 
         {
             try
             {
-                _repository.Delete(id);
+                _repository.Delete(query);
                 return Ok();
             }
             catch (Exception ex)

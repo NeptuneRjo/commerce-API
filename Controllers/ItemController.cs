@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CommerceClone.Controllers
 {
+    [ApiController]
+    [Route("api/[controller]/[action]/{query?}")]
     public class ItemController : ControllerBase
     {
         private readonly ItemRepository _repository;
@@ -32,7 +34,7 @@ namespace CommerceClone.Controllers
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public ActionResult<ICollection<Item>> AllItems()
+        public ActionResult<ICollection<Item>> All()
         {
             try
             {
@@ -48,7 +50,7 @@ namespace CommerceClone.Controllers
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public ActionResult<Item> GetItem(string query)
+        public ActionResult<Item> Get(string query)
         {
             try
             {
@@ -67,11 +69,11 @@ namespace CommerceClone.Controllers
         [HttpPatch]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public ActionResult Update(Item item)
+        public ActionResult Update(int query, Item item)
         {
             try
             {
-                _repository.Update(item);
+                _repository.Update(query, item);
                 return Ok();
             }
             catch (Exception ex)
@@ -83,11 +85,11 @@ namespace CommerceClone.Controllers
         [HttpDelete]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public ActionResult DeleteItem(int id) 
+        public ActionResult Delete(int query) 
         {
             try
             {
-                _repository.Delete(id);
+                _repository.Delete(query);
                 return Ok();
             }
             catch (Exception ex)

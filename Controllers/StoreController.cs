@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CommerceClone.Controllers
 {
+    [ApiController]
+    [Route("api/[controller]/[action]/{query?}")]
     public class StoreController : Controller
     {
         private readonly StoreRepository _repository;
@@ -32,7 +34,7 @@ namespace CommerceClone.Controllers
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public ActionResult<ICollection<Store>> AllStores()
+        public ActionResult<ICollection<Store>> All()
         {
             try
             {
@@ -47,11 +49,11 @@ namespace CommerceClone.Controllers
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public ActionResult<Store> GetStore(int id)
+        public ActionResult<Store> Get(int query)
         {
             try
             {
-                return Ok(_repository.GetById(id));
+                return Ok(_repository.GetById(query));
             }
             catch (Exception ex)
             {
@@ -62,11 +64,11 @@ namespace CommerceClone.Controllers
         [HttpPatch]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public ActionResult Update(Store store)
+        public ActionResult Update(int query, Store store)
         {
             try
             {
-                _repository.Update(store);
+                _repository.Update(query, store);
                 return Ok();
             }
             catch (Exception ex)
@@ -78,11 +80,11 @@ namespace CommerceClone.Controllers
         [HttpDelete]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public ActionResult Delete(int id) 
+        public ActionResult Delete(int query) 
         {
             try
             {
-                _repository.Delete(id);
+                _repository.Delete(query);
                 return Ok();
             }
             catch (Exception ex)
