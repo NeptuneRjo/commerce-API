@@ -14,7 +14,7 @@ namespace CommerceClone.Repository
 
         public Admin GetAdminByUsername(string username)
         {
-            return _context.Admins.Find(username);
+            return _context.Admins.SingleOrDefault(c => c.Username == username);
         }
     }
 }
