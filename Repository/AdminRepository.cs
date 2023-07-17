@@ -12,9 +12,9 @@ namespace CommerceClone.Repository
             _context = context;
         }
 
-        public Admin GetAdminByUsername(string username)
+        public Admin GetAdminByEmail(string email)
         {
-            return _context.Admins.SingleOrDefault(c => c.Username == username);
+            return _context.Admins.SingleOrDefault(c => c.Email == email);
         }
     }
 }
