@@ -18,11 +18,13 @@ namespace CommerceClone.Repository
         public void Add(TEntity entity)
         {
             _context.Set<TEntity>().Add(entity);
+            _context.SaveChanges();
         }
 
         public void AddRange(IEnumerable<TEntity> entities)
         {
             _context.Set<TEntity>().AddRange(entities);
+            _context.SaveChanges();
         }
 
         public ICollection<TEntity> GetAll()
@@ -38,6 +40,7 @@ namespace CommerceClone.Repository
         public void Update(TEntity entity)
         {
             _context.Set<TEntity>().Update(entity);
+            _context.SaveChanges();
         }
 
         public void Delete(int id)
@@ -45,6 +48,7 @@ namespace CommerceClone.Repository
             var entity = _context.Set<TEntity>().Find(id);
 
             _context.Set<TEntity>().Remove(entity);
+            _context.SaveChanges();
         }
     }
 }
