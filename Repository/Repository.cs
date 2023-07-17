@@ -37,10 +37,13 @@ namespace CommerceClone.Repository
             return _context.Set<TEntity>().Find(id);
         }
 
-        public void Update(TEntity entity)
+        public void Update(int id, TEntity entity)
         {
-            _context.Set<TEntity>().Update(entity);
+            var foundEntity = _context.Set<TEntity>().Find(id);
+
+            _context.Set<TEntity>().Entry(foundEntity).CurrentValues.SetValues(entity);
             _context.SaveChanges();
+            //_context.Set<TEntity>().Update(entity);
         }
 
         public void Delete(int id)

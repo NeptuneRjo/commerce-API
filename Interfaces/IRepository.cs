@@ -6,7 +6,7 @@
         void AddRange(IEnumerable<TEntity> entities);
         ICollection<TEntity> GetAll();
         TEntity GetById(int id);
-        void Update(TEntity entity);
+        void Update(int id, TEntity entity);
         void Delete(int id);
     }
 }
