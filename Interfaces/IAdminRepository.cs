@@ -2,7 +2,7 @@
 
 namespace CommerceClone.Interfaces
 {
-    public interface IAdminRepository
+    public interface IAdminRepository : IRepository<Admin>
     {
         Admin GetAdminByUsername(string username);
     }
