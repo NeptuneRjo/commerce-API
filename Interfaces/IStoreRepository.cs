@@ -4,6 +4,6 @@ namespace CommerceClone.Interfaces
 {
     public interface IStoreRepository
     {
-        IEnumerable<Store> GetStoresByAdmin(string email);
+        IEnumerable<Store> GetStoresByAdmin(Admin admin);
     }
 }

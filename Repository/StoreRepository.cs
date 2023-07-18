@@ -11,10 +11,10 @@ namespace CommerceClone.Repository
         {
             _context = context;
         }
-        public IEnumerable<Store> GetStoresByAdmin(string email)
+        public IEnumerable<Store> GetStoresByAdmin(Admin admin)
         {
             return _context.Stores
-                .Where(e => e.OwnerEmail == email)
+                .Where(e => e.Admin == admin)
                 .ToList();
         }
     }
