@@ -5,13 +5,16 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CommerceClone.Controllers
 {
+    using BCrypt.Net;
+    using CommerceClone.Interfaces;
+
     [ApiController]
     [Route("api/[controller]/[action]/{query?}")]
     public class UserController : ControllerBase
     {
-        private readonly UserRepository _repository;
+        private readonly IUserRepository _repository;
 
-        public UserController(UserRepository repository)
+        public UserController(IUserRepository repository)
         {
             _repository = repository;
         }
@@ -23,7 +26,13 @@ namespace CommerceClone.Controllers
         {
             try
             {
+                string salt = BCrypt.GenerateSalt();
+                string hashedPassword = BCrypt.HashPassword(user.Password, salt);
+
+                user.Password = hashedPassword;
+
                 _repository.Add(user);
+
                 return StatusCode(201);
             }
             catch (Exception ex)
@@ -59,7 +68,7 @@ namespace CommerceClone.Controllers
                     return Ok(_repository.GetById(i));
                 }
 
-                return Ok(_repository.GetUserByUsername(query));
+                return Ok(_repository.GetUserByEmail(query));
             }
             catch (Exception ex)
             {
