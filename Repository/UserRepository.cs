@@ -12,9 +12,9 @@ namespace CommerceClone.Repository
             _context = context;
         }
 
-        public User GetUserByUsername(string username)
+        public User GetUserByEmail(string email)
         {
-            return _context.Users.Find(username);
+           return _context.Users.FirstOrDefault(e => e.Email == email);
         }
     }
 }

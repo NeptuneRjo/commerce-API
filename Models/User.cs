@@ -1,6 +1,8 @@
-﻿namespace CommerceClone.Models
+﻿using Microsoft.AspNetCore.Identity;
+
+namespace CommerceClone.Models
 {
-    public class User
+    public class User : IdentityUser
     {
         public int Id { get; set; }
         public string Email { get; set; }
