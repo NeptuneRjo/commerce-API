@@ -14,7 +14,7 @@ namespace CommerceClone.Models
         public Store Store { get; set; }
         public int StoreId { get; set; }
 
-        public Cart Cart { get; set; }
-        public int CartId { get; set; }
+        public User User { get; set; }
+        public int UserId { get; set; }
     }
 }
