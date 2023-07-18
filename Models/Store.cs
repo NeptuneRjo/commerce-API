@@ -8,7 +8,6 @@
 
         public ICollection<Item> Items { get; set; }
 
-        public Admin Admin { get; set; }
-        public int AdminId { get; set; }
+        public string AdminEmail { get; set; }
     }
 }
