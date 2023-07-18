@@ -17,23 +17,11 @@ namespace CommerceClone.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // AdminStores
-            modelBuilder.Entity<Admin>()
-                .HasMany(e => e.Stores)
-                .WithOne(e => e.Admin)
-                .HasForeignKey(e => e.AdminId);
-
             // StoreItems
             modelBuilder.Entity<Store>()
                 .HasMany(e => e.Items)
                 .WithOne(e => e.Store)
                 .HasForeignKey(e => e.StoreId);
-
-            // UserCart
-            modelBuilder.Entity<User>()
-                .HasOne(e => e.Cart)
-                .WithOne(e => e.User)
-                .HasForeignKey<Cart>(e => e.UserId);
 
             // CartItems
             modelBuilder.Entity<Cart>()
