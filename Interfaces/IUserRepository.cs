@@ -2,8 +2,8 @@
 
 namespace CommerceClone.Interfaces
 {
-    public interface IUserRepository
+    public interface IUserRepository : IRepository<User>
     {
-        User GetUserByUsername(string username);
+        User GetUserByEmail(string email);
     }
 }
