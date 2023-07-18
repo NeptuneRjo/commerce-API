@@ -7,22 +7,14 @@ namespace CommerceClone.Repository
     {
         private readonly IDataContext _context;
 
-        public StoreRepository(IDataContext context) : base(context) 
+        public StoreRepository(IDataContext context) : base(context)
         {
             _context = context;
         }
-
-        public IEnumerable<Store> GetStoresByAdmin(Admin admin)
-        {
-            return _context.Stores
-                .Where(e => e.Admin == admin)
-                .ToList();
-        }
-
         public IEnumerable<Store> GetStoresByAdmin(string email)
         {
             return _context.Stores
-                .Where(e => e.Admin.Email == email)
+                .Where(e => e.OwnerEmail == email)
                 .ToList();
         }
     }
