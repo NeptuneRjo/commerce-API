@@ -56,5 +56,52 @@ namespace CommerceClone.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        // PUT: v1/admin
+        [Authorize]
+        public ActionResult UpdateAdmin(Admin update) 
+        { 
+            if (!ModelState.IsValid)
+                return BadRequest();
+
+            try
+            {
+                var email = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                var admin = _admin.GetByEmail(email);
+
+                if (admin == null)
+                    return NotFound();
+
+                _admin.Update(admin.Id, update);
+
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        // DELETE: v1/admin
+        [Authorize]
+        public ActionResult DeleteAdmin()
+        {
+            try
+            {
+                var email = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                var admin = _admin.GetByEmail(email);
+
+                if (admin == null)
+                    return NotFound();
+
+                _admin.Delete(admin.Id);
+
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }
