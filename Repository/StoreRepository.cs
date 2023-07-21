@@ -11,11 +11,22 @@ namespace CommerceClone.Repository
         {
             _context = context;
         }
-        public IEnumerable<Store> GetStoresByAdmin(Admin admin)
+
+        public void AddToAdmin(string key, Store store)
         {
-            return _context.Stores
-                .Where(e => e.Admin == admin)
-                .ToList();
+            var admin = _context.Admins.FirstOrDefault(e => e.SecretKey == key);
+
+            _context.Stores.Add(store);
+            admin.Stores.Add(store);
+
+            _context.SaveChanges();
+        }
+
+        public ICollection<Store> GetAllByKey(string key)
+        {
+            return _context.Admins
+                .FirstOrDefault(e => e.PublicKey == key)
+                .Stores.ToList();
         }
     }
 }

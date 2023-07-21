@@ -2,8 +2,9 @@
 
 namespace CommerceClone.Interfaces
 {
-    public interface IStoreRepository
+    public interface IStoreRepository : IRepository<Store>
     {
-        IEnumerable<Store> GetStoresByAdmin(Admin admin);
+        void AddToAdmin(string key, Store store);
+        ICollection<Store> GetAllByKey(string key);
     }
 }
