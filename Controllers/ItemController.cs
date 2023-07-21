@@ -1,28 +1,35 @@
-﻿using CommerceClone.Models;
-using CommerceClone.Repository;
+﻿using CommerceClone.Interfaces;
+using CommerceClone.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CommerceClone.Controllers
 {
     [ApiController]
-    [Route("api/[controller]/[action]/{query?}")]
+    [Route("v1/stores")]
     public class ItemController : ControllerBase
     {
-        private readonly ItemRepository _repository;
+        private readonly IItemRepository _item;
+        private readonly IStoreRepository _store;
 
-        public ItemController(ItemRepository repository)
+        public ItemController(IItemRepository item, IStoreRepository store)
         {
-            _repository = repository;
+            _item = item;
+            _store = store;
         }
 
-        [HttpPost]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public ActionResult Create(Item item)
+        // POST: v1/stores/{store_id}/items
+        [HttpPost("/{storeId}/items")]
+        public ActionResult CreateItem(int storeId, Item item) 
         {
+            if (!ModelState.IsValid)
+                return BadRequest();
+
             try
             {
-                _repository.Add(item);
+                var key = Request.Headers["X-Authorization"];
+
+                _item.AddToStore(key, storeId, item);
+
                 return Ok();
             }
             catch (Exception ex)
@@ -31,15 +38,17 @@ namespace CommerceClone.Controllers
             }
         }
 
-        [HttpGet]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public ActionResult<ICollection<Item>> All()
+        // GET: v1/stores/{store_id}/items
+        [HttpGet("/{storeId}/items")]
+        public ActionResult GetItems(int storeId)
         {
             try
             {
-                return Ok(_repository.GetAll());
+                var key = Request.Headers["X-Authorization"];
 
+                var items = _item.GetByStore(storeId, key);
+
+                return Ok(items);
             }
             catch (Exception ex)
             {
@@ -47,33 +56,55 @@ namespace CommerceClone.Controllers
             }
         }
 
-        [HttpGet]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public ActionResult<Item> Get(string query)
+        // GET: v1/stores/{store_id}/items/{item_id}
+        [HttpGet("/{storeId}/items/{itemId}")]
+        public ActionResult GetItemById(int storeId, int itemId) 
         {
             try
             {
-                if (Int32.TryParse(query, out int i))
-                    return Ok(_repository.GetById(i));
-                
+                var key = Request.Headers["X-Authorization"];
+                var item = _item.GetById(itemId);
 
-                return Ok(_repository.GetItemByName(query));
+                if (item == null)
+                    return NotFound();
+
+                if (item.StoreId != storeId)
+                    return BadRequest();
+
+                if (item.Store.Admin.PublicKey != key)
+                    return Unauthorized();
+
+                return Ok(item);
             }
-            catch (Exception ex)
+            catch (Exception ex) 
             {
-                return NotFound(ex.Message);
+                return BadRequest(ex.Message);
             }
         }
 
-        [HttpPatch]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public ActionResult Update(int query, Item item)
+        // PUT: v1/stores/{store_id}/items/{item_id}
+        [HttpPut("/{storeId}/items/{itemId}")]
+        public ActionResult UpdateItem(int storeId, int itemId, Item update)
         {
+            if (!ModelState.IsValid)
+                return BadRequest();
+
             try
             {
-                _repository.Update(query, item);
+                var key = Request.Headers["X-Authorization"];
+                var item = _item.GetById(itemId);
+
+                if (item == null)
+                    return NotFound();
+
+                if (item.StoreId != storeId)
+                    return BadRequest();
+
+                if (item.Store.Admin.SecretKey != key)
+                    return Unauthorized();
+
+                _item.Update(itemId, update);
+
                 return Ok();
             }
             catch (Exception ex)
@@ -82,14 +113,26 @@ namespace CommerceClone.Controllers
             }
         }
 
-        [HttpDelete]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public ActionResult Delete(int query) 
+        // DELETE: v1/stores/{store_id}/items/{item_id}
+        [HttpDelete("/{storeId}/items/{itemId}")]
+        public ActionResult DeleteItem(int storeId, int itemId)
         {
             try
             {
-                _repository.Delete(query);
+                var key = Request.Headers["X-Authorization"];
+                var item = _item.GetById(itemId);
+
+                if (item == null)
+                    return NotFound();
+
+                if (item.StoreId != storeId)
+                    return BadRequest();
+
+                if (item.Store.Admin.SecretKey != key)
+                    return Unauthorized();
+
+                _item.Delete(itemId);
+
                 return Ok();
             }
             catch (Exception ex)
@@ -97,5 +140,6 @@ namespace CommerceClone.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
     }
 }
