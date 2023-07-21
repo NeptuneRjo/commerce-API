@@ -11,15 +11,15 @@ namespace CommerceClone.Controllers
     using BCrypt.Net;
 
     [ApiController]
-    [Route("auth/[action]/{query?}")]
+    [Route("v1/auth")]
     public class AuthenticationController : ControllerBase
     {
-        private readonly IAuthenticationRepository _auth;
+        private readonly IAdminRepository _admin;
         private readonly IUserRepository _user;
 
-        public AuthenticationController(IAuthenticationRepository auth, IUserRepository user)
+        public AuthenticationController(IAdminRepository admin, IUserRepository user)
         {
-            _auth = auth;
+            _admin = admin;
             _user = user;
         }
 
@@ -30,7 +30,7 @@ namespace CommerceClone.Controllers
             return Ok(await HttpContext.GetExternalProvidersAsync());
         }
 
-        [HttpPost]
+        [HttpPost("/oauth")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult> OAuth([FromForm] string provider)
         {
@@ -43,12 +43,12 @@ namespace CommerceClone.Controllers
             return Challenge(new AuthenticationProperties { RedirectUri = "/" }, provider);
         }
 
-        [HttpPost]
-        public async Task<ActionResult> Email(User user)
+        [HttpPost("/email/user")]
+        public async Task<ActionResult> UserEmail(User user)
         {
             if (ModelState.IsValid)
             {
-                var foundUser = _user.GetUserByEmail(user.Email);
+                var foundUser = _user.GetByEmail(user.Email);
 
                 if (foundUser == null)
                     return BadRequest("No user with those credentials found.");
@@ -81,8 +81,46 @@ namespace CommerceClone.Controllers
             return BadRequest();
         }
 
-        [HttpGet]
-        [HttpPost]
+        [HttpPost("/email/admin")]
+        public async Task<ActionResult> AdminEmail(Admin admin)
+        {
+            if (ModelState.IsValid)
+            {
+                var foundAdmin = _admin.GetByEmail(admin.Email);
+
+                if (foundAdmin == null)
+                    return BadRequest("No admin with those credentials found.");
+
+                if (BCrypt.Verify(admin.Password, foundAdmin.Password))
+                {
+                    var identity = new ClaimsIdentity(CookieAuthenticationDefaults.AuthenticationScheme, ClaimTypes.Name, ClaimTypes.Role);
+                    identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, admin.Email));
+                    identity.AddClaim(new Claim(ClaimTypes.Name, admin.Email));
+
+                    var principal = new ClaimsPrincipal(identity);
+
+                    await HttpContext.SignInAsync(
+                        CookieAuthenticationDefaults.AuthenticationScheme,
+                        principal,
+                        new AuthenticationProperties
+                        {
+                            IsPersistent = true,
+                            AllowRefresh = true,
+                            ExpiresUtc = DateTime.UtcNow.AddDays(1),
+                            RedirectUri = "/"
+                        }
+                    );
+
+                    return Ok();
+                }
+                return BadRequest();
+            }
+
+            return BadRequest();
+        }
+
+        [HttpGet("/signout")]
+        [HttpPost("/signout")]
         public ActionResult SignOutUser()
         {
             return SignOut(new AuthenticationProperties { RedirectUri = "/" },
