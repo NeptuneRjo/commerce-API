@@ -2,11 +2,11 @@
 using CommerceClone.Repository;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using CommerceClone.Interfaces;
 
 namespace CommerceClone.Controllers
 {
     using BCrypt.Net;
-    using CommerceClone.Interfaces;
 
     [ApiController]
     [Route("api/[controller]/[action]/{query?}")]
