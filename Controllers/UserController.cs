@@ -7,84 +7,38 @@ using CommerceClone.Interfaces;
 namespace CommerceClone.Controllers
 {
     using BCrypt.Net;
+    using Microsoft.AspNetCore.Authorization;
+    using System.Security.Claims;
 
     [ApiController]
-    [Route("api/[controller]/[action]/{query?}")]
+    [Route("v1/user")]
     public class UserController : ControllerBase
     {
-        private readonly IUserRepository _repository;
+        private readonly IUserRepository _user;
 
         public UserController(IUserRepository repository)
         {
-            _repository = repository;
+            _user = repository;
         }
 
+        // POST: v1/user
         [HttpPost]
-        [ProducesResponseType(StatusCodes.Status201Created)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public ActionResult Create(User user)
+        public ActionResult CreateUser(User user)
         {
+            if (!ModelState.IsValid)
+                return BadRequest();
+
             try
             {
-                string salt = BCrypt.GenerateSalt();
-                string hashedPassword = BCrypt.HashPassword(user.Password, salt);
+                var exists = _user.Exists(user.Email);
 
-                user.Password = hashedPassword;
+                if (exists)
+                    return BadRequest("A user with these credentials already exists");
 
-                _repository.Add(user);
+                user.Password = _user.HashPassword(user.Password);
 
-                return StatusCode(201);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
+                _user.Add(user);
 
-        [HttpGet]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public ActionResult<ICollection<User>> All()
-        {
-            try
-            {
-                return Ok(_repository.GetAll());
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
-
-        [HttpGet]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public ActionResult<User> Get(string query) 
-        {
-            try
-            {
-                if (Int32.TryParse(query, out int i))
-                {
-                    return Ok(_repository.GetById(i));
-                }
-
-                return Ok(_repository.GetUserByEmail(query));
-            }
-            catch (Exception ex)
-            {
-                return NotFound(ex.Message);
-            }
-            
-        }
-
-        [HttpPatch]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public ActionResult Update(int query, User user) 
-        {
-            try
-            {
-                _repository.Update(query, user);
                 return Ok();
             }
             catch (Exception ex)
@@ -93,14 +47,68 @@ namespace CommerceClone.Controllers
             }
         }
 
+        // GET: v1/user
+        [Authorize]
+        [HttpGet]
+        public ActionResult GetUser()
+        {
+            try
+            {
+                var email = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                var user = _user.GetByEmail(email);
+
+                if (user == null)
+                    return NotFound();
+
+                return Ok(user);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        // PUT: v1/user
+        [Authorize]
+        [HttpPut]
+        public ActionResult UpdateUser(User update)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest();
+
+            try
+            {
+                var email = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                var user = _user.GetByEmail(email);
+
+                if (user == null) 
+                    return NotFound();
+
+                _user.Update(user.Id, update);
+
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        // DELETE: v1/user
+        [Authorize]
         [HttpDelete]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public ActionResult Delete(int query)
+        public ActionResult DeleteUser()
         {
             try
             {
-                _repository.Delete(query);
+                var email = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                var user = _user.GetByEmail(email);
+
+                if (user == null)
+                    return NotFound();
+
+                _user.Delete(user.Id);
+
                 return Ok();
             }
             catch (Exception ex)
@@ -108,5 +116,6 @@ namespace CommerceClone.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
     }
 }
