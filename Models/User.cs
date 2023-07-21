@@ -7,5 +7,10 @@
         public string Password { get; set; }
 
         public ICollection<Item> Cart { get; set; }
+
+        public User()
+        {
+            Cart = new List<Item>();
+        }
     }
 }
