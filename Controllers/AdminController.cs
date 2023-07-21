@@ -7,6 +7,7 @@ using System.Security.Claims;
 namespace CommerceClone.Controllers
 {
     [ApiController]
+    [Route("v1/admin")]
     public class AdminController : ControllerBase
     {
         private readonly IAdminRepository _admin;
@@ -17,6 +18,7 @@ namespace CommerceClone.Controllers
         }
 
         // POST: v1/admin
+        [HttpPost]
         public ActionResult CreateAdmin(Admin admin)
         {
             if (!ModelState.IsValid)
@@ -39,6 +41,7 @@ namespace CommerceClone.Controllers
 
         // GET: v1/admin
         [Authorize]
+        [HttpGet]
         public ActionResult GetAdmin()
         {
             try
@@ -59,6 +62,7 @@ namespace CommerceClone.Controllers
 
         // PUT: v1/admin
         [Authorize]
+        [HttpPut]
         public ActionResult UpdateAdmin(Admin update) 
         { 
             if (!ModelState.IsValid)
@@ -84,6 +88,7 @@ namespace CommerceClone.Controllers
 
         // DELETE: v1/admin
         [Authorize]
+        [HttpDelete]
         public ActionResult DeleteAdmin()
         {
             try
