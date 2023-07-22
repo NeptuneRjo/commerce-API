@@ -22,11 +22,17 @@ namespace CommerceClone.Data
                 .WithOne(e => e.Store)
                 .HasForeignKey(e => e.StoreId);
 
-            // UserCart
-            modelBuilder.Entity<User>()
-                .HasMany(e => e.Cart) // Items
-                .WithOne(e => e.User)
-                .HasForeignKey(e => e.UserId);
+            // StoreUser
+            modelBuilder.Entity<Store>()
+                .HasMany(e => e.Users)
+                .WithOne(e => e.Store)
+                .HasForeignKey(e => e.StoreId);
+
+            // CartCartItems
+            modelBuilder.Entity<Cart>()
+                .HasMany(e => e.CartItems)
+                .WithOne(e => e.Cart)
+                .HasForeignKey(e => e.CartId);
 
             // AdminStores
             modelBuilder.Entity<Admin>()
