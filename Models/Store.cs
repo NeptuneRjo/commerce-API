@@ -11,6 +11,8 @@
         public Admin Admin { get; set; }
         public int AdminId { get; set; }
 
+        public ICollection<User> Users { get; set; }
+
         public Store()
         {
             Items = new List<Item>();

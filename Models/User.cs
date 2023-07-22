@@ -6,11 +6,10 @@
         public string Email { get; set; }
         public string Password { get; set; }
 
-        public ICollection<Item> Cart { get; set; }
+        public Cart Cart { get; set; }
 
-        public User()
-        {
-            Cart = new List<Item>();
-        }
+        public Store Store { get; set; }
+        public int StoreId { get; set; }
+
     }
 }
