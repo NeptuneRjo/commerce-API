@@ -15,12 +15,10 @@ namespace CommerceClone.Controllers
     public class AuthenticationController : ControllerBase
     {
         private readonly IAdminRepository _admin;
-        private readonly IUserRepository _user;
 
-        public AuthenticationController(IAdminRepository admin, IUserRepository user)
+        public AuthenticationController(IAdminRepository admin)
         {
             _admin = admin;
-            _user = user;
         }
 
         [HttpGet]
@@ -41,44 +39,6 @@ namespace CommerceClone.Controllers
                 return BadRequest();
 
             return Challenge(new AuthenticationProperties { RedirectUri = "/" }, provider);
-        }
-
-        [HttpPost("/email/user")]
-        public async Task<ActionResult> UserEmail(User user)
-        {
-            if (ModelState.IsValid)
-            {
-                var foundUser = _user.GetByEmail(user.Email);
-
-                if (foundUser == null)
-                    return BadRequest("No user with those credentials found.");
-
-                if (BCrypt.Verify(user.Password, foundUser.Password))
-                {
-                    var identity = new ClaimsIdentity(CookieAuthenticationDefaults.AuthenticationScheme, ClaimTypes.Name, ClaimTypes.Role);
-                    identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, user.Email));
-                    identity.AddClaim(new Claim(ClaimTypes.Name, user.Email));
-
-                    var principal = new ClaimsPrincipal(identity);
-
-                    await HttpContext.SignInAsync(
-                        CookieAuthenticationDefaults.AuthenticationScheme,
-                        principal,
-                        new AuthenticationProperties
-                        {
-                            IsPersistent = true,
-                            AllowRefresh = true,
-                            ExpiresUtc = DateTime.UtcNow.AddDays(1),
-                            RedirectUri = "/"
-                        }
-                    );
-
-                    return Ok();
-                }
-                return BadRequest();
-            }
-
-            return BadRequest();
         }
 
         [HttpPost("/email/admin")]

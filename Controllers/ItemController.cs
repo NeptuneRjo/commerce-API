@@ -9,12 +9,10 @@ namespace CommerceClone.Controllers
     public class ItemController : ControllerBase
     {
         private readonly IItemRepository _item;
-        private readonly IStoreRepository _store;
 
-        public ItemController(IItemRepository item, IStoreRepository store)
+        public ItemController(IItemRepository item)
         {
             _item = item;
-            _store = store;
         }
 
         // POST: v1/stores/{store_id}/items
