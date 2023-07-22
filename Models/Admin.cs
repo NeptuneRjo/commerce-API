@@ -13,6 +13,8 @@
         public Admin()
         {
             Stores = new List<Store>();
+            PublicKey = "";
+            SecretKey = "";
         }
     }
 }
