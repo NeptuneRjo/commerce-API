@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace CommerceClone.Models
+﻿namespace CommerceClone.Models
 {
     public class Item
     {
@@ -14,7 +12,7 @@ namespace CommerceClone.Models
         public Store Store { get; set; }
         public int StoreId { get; set; }
 
-        public CartItem CartItem { get; set; }
-        public int CartItemId { get; set; }
+        public Cart Cart { get; set; }
+        public int CartId { get; set; }
     }
 }
