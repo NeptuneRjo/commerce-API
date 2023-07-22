@@ -11,8 +11,9 @@ namespace CommerceClone.Data
 
         public DbSet<Item> Items { get; set; }
         public DbSet<Store> Stores { get; set; }
-        public DbSet<User> Users { get; set; }
+        //public DbSet<User> Users { get; set; }
         public DbSet<Admin> Admins { get; set; }
+        public DbSet<Cart> Carts { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -22,15 +23,15 @@ namespace CommerceClone.Data
                 .WithOne(e => e.Store)
                 .HasForeignKey(e => e.StoreId);
 
-            // StoreUser
+            // StoreCarts
             modelBuilder.Entity<Store>()
-                .HasMany(e => e.Users)
+                .HasMany(e => e.Carts)
                 .WithOne(e => e.Store)
                 .HasForeignKey(e => e.StoreId);
 
-            // CartCartItems
+            // CartItems
             modelBuilder.Entity<Cart>()
-                .HasMany(e => e.CartItems)
+                .HasMany(e => e.Items)
                 .WithOne(e => e.Cart)
                 .HasForeignKey(e => e.CartId);
 
