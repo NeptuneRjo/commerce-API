@@ -31,7 +31,7 @@ namespace CommerceClone.Repository
 
         public Admin GetByEmail(string email)
         {
-            return _context.Admins.FirstOrDefault(e => e.Email == email);
+            return _context.Admins.First(e => e.Email == email);
         }
 
         public string EncryptPass(string password)
