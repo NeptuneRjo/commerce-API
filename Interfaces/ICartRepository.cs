@@ -4,9 +4,8 @@ namespace CommerceClone.Interfaces
 {
     public interface ICartRepository : IRepository<Cart>
     {
-        Cart GetByUid(string uid);
-        void AddToStore(int storeId, Cart cart);
-        Cart AddItem(Cart cart, int itemId);
-        Cart RemoveItem(Cart cart, int itemId);
+        Cart AddItem(Cart cart, string itemId, int quantity);
+        Cart ClearItems(Cart cart);
+        ICollection<CartItem> RemoveItem(ICollection<CartItem> items, string itemId, int quantity);
     }
 }

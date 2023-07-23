@@ -1,32 +1,32 @@
-﻿namespace CommerceClone.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace CommerceClone.Models
 {
     public class Cart
     {
-        public int Id { get; set; }
-        public string Uid { get; set; }
+        [Key]
+        public string Id { get; set; }
         public int TotalItems { get; set; }
         public int TotalUniqueItems { get; set; }
         public string Subtotal { get; set; }
 
         public Store Store { get; set; }
-        public int StoreId { get; set; }
+        public string StoreId { get; set; }
 
-        public ICollection<Item> Items { get; set; }
+        public ICollection<CartItem> CartItems { get; set; }
 
         public Cart()
         {
+            CartItems = new List<CartItem>();
 
-            Uid = "";
-            Items = new List<Item>();
+            TotalItems = CartItems.Count();
 
-            TotalItems = Items.Count();
-
-            TotalUniqueItems = Items.GroupBy(e => e.Id)
+            TotalUniqueItems = CartItems.GroupBy(e => e.Id)
                 .Select(group => new { Id = group.Key, Count = group.Count() })
                 .ToList()
                 .Count();
 
-            Subtotal = Items.Sum(e => e.Price).ToString();
+            Subtotal = CartItems.Sum(e => e.Total).ToString();
         }
     }
 }
