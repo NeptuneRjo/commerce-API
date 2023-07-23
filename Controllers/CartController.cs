@@ -28,9 +28,9 @@ namespace CommerceClone.Controllers
             _store = store;
         }
 
-        // POST: v1/cart/{store_id}
-        [HttpPost("/{storeId}")]
-        public ActionResult CreateCart(string storeId, Cart cart)
+        // POST: v1/cart
+        [HttpPost]
+        public ActionResult CreateCart(Cart cart)
         {
             if (!ModelState.IsValid)
                 return BadRequest();
@@ -38,15 +38,13 @@ namespace CommerceClone.Controllers
             try
             {
                 var key = Request.Headers["X-Authorization"];
-                var store = _store.GetById(storeId);
+                var store = _store.GetById(cart.StoreId);
 
                 if (store == null)
                     return NotFound();
 
                 if (store.Admin.PublicKey != key)
                     return Unauthorized();
-
-                cart.StoreId = storeId;
 
                 _cart.Add(cart);
 

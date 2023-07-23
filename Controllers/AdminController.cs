@@ -76,7 +76,7 @@ namespace CommerceClone.Controllers
                 if (admin == null)
                     return NotFound();
 
-                _admin.Update(admin.Id, update);
+                _admin.Update(admin.Id.ToString(), update);
 
                 return Ok();
             }

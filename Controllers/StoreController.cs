@@ -9,10 +9,12 @@ namespace CommerceClone.Controllers
     public class StoreController : ControllerBase
     {
         private readonly IStoreRepository _store;
+        private readonly IAdminRepository _admin;
 
-        public StoreController(IStoreRepository storeRepository)
+        public StoreController(IStoreRepository storeRepository, IAdminRepository admin)
         {
             _store = storeRepository;
+            _admin = admin;
         }
 
         // POST: v1/stores
@@ -25,10 +27,16 @@ namespace CommerceClone.Controllers
             try
             {
                 var key = Request.Headers["X-Authorization"];
+                var admin = _admin.GetBySk(key);
 
-                _store.AddToAdmin(key, store);
+                if (admin == null)
+                    return NotFound();
 
-                return Ok();
+                store.AdminId = admin.Id;
+
+                _store.Add(store);
+
+                return Ok(store);
             }
             catch (Exception ex)
             {
@@ -43,7 +51,12 @@ namespace CommerceClone.Controllers
             try
             {
                 var key = Request.Headers["X-Authorization"];
-                var stores = _store.GetAllByKey(key);
+                var admin = _admin.GetByPk(key);
+
+                if (admin == null)
+                    return NotFound();
+
+                var stores = admin.Stores.ToList();
 
                 return Ok(stores);
             }
@@ -55,7 +68,7 @@ namespace CommerceClone.Controllers
 
         // GET: v1/stores/{store_id}
         [HttpGet("/{storeId}")]
-        public ActionResult GetStoreById(int storeId)
+        public ActionResult GetStoreById(string storeId)
         {
             try
             {
@@ -78,7 +91,7 @@ namespace CommerceClone.Controllers
 
         // PUT: v1/stores/{store_id}
         [HttpPut("/{storeId}")]
-        public ActionResult UpdateStore(int storeId, Store update)
+        public ActionResult UpdateStore(string storeId, Store update)
         {
             if (!ModelState.IsValid)
                 return BadRequest();
@@ -95,8 +108,8 @@ namespace CommerceClone.Controllers
                     return Unauthorized();
 
                 _store.Update(storeId, update);
-
-                return Ok();
+               
+                return Ok(store);
             }
             catch (Exception ex)
             {
@@ -106,7 +119,7 @@ namespace CommerceClone.Controllers
 
         // DELETE: v1/stores/{store_id}
         [HttpDelete("/{storeId}")]
-        public ActionResult DeleteStore(int storeId)
+        public ActionResult DeleteStore(string storeId)
         {
             try
             {

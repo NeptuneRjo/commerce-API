@@ -5,19 +5,21 @@ using Microsoft.AspNetCore.Mvc;
 namespace CommerceClone.Controllers
 {
     [ApiController]
-    [Route("v1/stores")]
+    [Route("v1/items")]
     public class ItemController : ControllerBase
     {
         private readonly IItemRepository _item;
+        private readonly IStoreRepository _store;
 
-        public ItemController(IItemRepository item)
+        public ItemController(IItemRepository item, IStoreRepository store)
         {
             _item = item;
+            _store = store;
         }
 
-        // POST: v1/stores/{store_id}/items
-        [HttpPost("/{storeId}/items")]
-        public ActionResult CreateItem(int storeId, Item item) 
+        // POST: v1/items
+        [HttpPost]
+        public ActionResult CreateItem(Item item)
         {
             if (!ModelState.IsValid)
                 return BadRequest();
@@ -25,10 +27,17 @@ namespace CommerceClone.Controllers
             try
             {
                 var key = Request.Headers["X-Authorization"];
+                var store = _store.GetById(item.StoreId);
 
-                _item.AddToStore(key, storeId, item);
+                if (store == null)
+                    return NotFound();
 
-                return Ok();
+                if (store.Admin.SecretKey != key)
+                    return Unauthorized();
+
+                _item.Add(item);
+                
+                return Ok(item);
             }
             catch (Exception ex)
             {
@@ -36,15 +45,22 @@ namespace CommerceClone.Controllers
             }
         }
 
-        // GET: v1/stores/{store_id}/items
-        [HttpGet("/{storeId}/items")]
-        public ActionResult GetItems(int storeId)
+        // GET: v1/items
+        [HttpGet]
+        public ActionResult GetItems([FromBody] string storeId)
         {
             try
             {
                 var key = Request.Headers["X-Authorization"];
+                var store = _store.GetById(storeId);
 
-                var items = _item.GetByStore(storeId, key);
+                if (store == null)
+                    return NotFound();
+
+                if (store.Admin.PublicKey != key)
+                    return Unauthorized();
+
+                var items = store.Items.ToList();
 
                 return Ok(items);
             }
@@ -54,9 +70,9 @@ namespace CommerceClone.Controllers
             }
         }
 
-        // GET: v1/stores/{store_id}/items/{item_id}
-        [HttpGet("/{storeId}/items/{itemId}")]
-        public ActionResult GetItemById(int storeId, int itemId) 
+        // GET: v1/items/{item_id}
+        [HttpGet("/{itemId}")]
+        public ActionResult GetItemById(string itemId)
         {
             try
             {
@@ -66,23 +82,20 @@ namespace CommerceClone.Controllers
                 if (item == null)
                     return NotFound();
 
-                if (item.StoreId != storeId)
-                    return BadRequest();
-
                 if (item.Store.Admin.PublicKey != key)
                     return Unauthorized();
 
                 return Ok(item);
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }
         }
 
-        // PUT: v1/stores/{store_id}/items/{item_id}
-        [HttpPut("/{storeId}/items/{itemId}")]
-        public ActionResult UpdateItem(int storeId, int itemId, Item update)
+        // PUT: v1/items/{item_id}
+        [HttpPut("/{itemId}")]
+        public ActionResult UpdateItem(string itemId, Item update)
         {
             if (!ModelState.IsValid)
                 return BadRequest();
@@ -95,15 +108,12 @@ namespace CommerceClone.Controllers
                 if (item == null)
                     return NotFound();
 
-                if (item.StoreId != storeId)
-                    return BadRequest();
-
                 if (item.Store.Admin.SecretKey != key)
                     return Unauthorized();
 
                 _item.Update(itemId, update);
 
-                return Ok();
+                return Ok(item);
             }
             catch (Exception ex)
             {
@@ -111,9 +121,9 @@ namespace CommerceClone.Controllers
             }
         }
 
-        // DELETE: v1/stores/{store_id}/items/{item_id}
-        [HttpDelete("/{storeId}/items/{itemId}")]
-        public ActionResult DeleteItem(int storeId, int itemId)
+        // DELETE: v1/items/{item_id}
+        [HttpDelete("/{itemId}")]
+        public ActionResult DeleteItem(string itemId)
         {
             try
             {
@@ -122,9 +132,6 @@ namespace CommerceClone.Controllers
 
                 if (item == null)
                     return NotFound();
-
-                if (item.StoreId != storeId)
-                    return BadRequest();
 
                 if (item.Store.Admin.SecretKey != key)
                     return Unauthorized();
