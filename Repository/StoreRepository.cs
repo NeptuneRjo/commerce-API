@@ -12,21 +12,16 @@ namespace CommerceClone.Repository
             _context = context;
         }
 
-        public void AddToAdmin(string key, Store store)
+        public Store AddByKey(string sk, Store store)
         {
-            var admin = _context.Admins.FirstOrDefault(e => e.SecretKey == key);
+            var admin = _context.Admins.First(e => e.SecretKey == sk);
 
-            _context.Stores.Add(store);
+            store.AdminId = admin.Id;
             admin.Stores.Add(store);
 
             _context.SaveChanges();
-        }
 
-        public ICollection<Store> GetAllByKey(string key)
-        {
-            return _context.Admins
-                .FirstOrDefault(e => e.PublicKey == key)
-                .Stores.ToList();
+            return store;
         }
     }
 }

@@ -41,5 +41,15 @@ namespace CommerceClone.Repository
 
             return hashedPass;
         }
+
+        public Admin GetByPk(string pk)
+        {
+            return _context.Admins.First(e => e.PublicKey == pk);
+        }
+
+        public Admin GetBySk(string sk)
+        {
+            return _context.Admins.First(e => e.SecretKey == sk);
+        }
     }
 }

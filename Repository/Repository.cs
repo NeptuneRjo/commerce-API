@@ -1,4 +1,5 @@
 ﻿using CommerceClone.Interfaces;
+using CommerceClone.Models;
 
 namespace CommerceClone.Repository
 {
@@ -15,10 +16,11 @@ namespace CommerceClone.Repository
             _context = context;
         }
 
-        public void Add(TEntity entity)
+        public TEntity Add(TEntity entity)
         {
             _context.Set<TEntity>().Add(entity);
             _context.SaveChanges();
+            return entity;
         }
 
         public void AddRange(IEnumerable<TEntity> entities)
@@ -32,12 +34,12 @@ namespace CommerceClone.Repository
             return _context.Set<TEntity>().ToList();
         }
 
-        public TEntity GetById(int id)
+        public TEntity GetById(string id)
         {
             return _context.Set<TEntity>().Find(id);
         }
 
-        public void Update(int id, TEntity entity)
+        public void Update(string id, TEntity entity)
         {
             var foundEntity = _context.Set<TEntity>().Find(id);
 
@@ -46,12 +48,24 @@ namespace CommerceClone.Repository
             //_context.Set<TEntity>().Update(entity);
         }
 
-        public void Delete(int id)
+        public void Delete(string id)
         {
             var entity = _context.Set<TEntity>().Find(id);
 
             _context.Set<TEntity>().Remove(entity);
             _context.SaveChanges();
+        }
+
+        public string GenerateUid(TEntity entity, string marker)
+        {
+            string id;
+
+            do
+            {
+                id = Guid.NewGuid().ToString("N");
+            } while (_context.Set<TEntity>().Find($"{marker.ToLower()}_{id}") != null);
+
+            return id;
         }
     }
 }
