@@ -7,5 +7,7 @@ namespace CommerceClone.Interfaces
         Admin GenerateKeys(Admin admin);
         string EncryptPass(string password);
         Admin GetByEmail(string email);
+        Admin GetByPk(string pk);
+        Admin GetBySk(string sk);
     }
 }

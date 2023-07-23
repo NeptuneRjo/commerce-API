@@ -4,7 +4,8 @@ namespace CommerceClone.Interfaces
 {
     public interface IStoreRepository : IRepository<Store>
     {
-        void AddToAdmin(string key, Store store);
-        ICollection<Store> GetAllByKey(string key);
+        //void AddToAdmin(string key, Store store);
+        //ICollection<Store> GetAllByKey(string key);
+        Store AddByKey(string sk, Store store);
     }
 }

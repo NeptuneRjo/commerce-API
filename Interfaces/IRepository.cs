@@ -2,11 +2,11 @@
 {
     public interface IRepository < TEntity >
     {
-        void Add (TEntity entity);
+        TEntity Add (TEntity entity);
         void AddRange(IEnumerable<TEntity> entities);
         ICollection<TEntity> GetAll();
-        TEntity GetById(int id);
-        void Update(int id, TEntity entity);
-        void Delete(int id);
+        TEntity GetById(string id);
+        void Update(string id, TEntity entity);
+        void Delete(string id);
     }
 }
