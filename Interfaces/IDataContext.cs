@@ -9,6 +9,7 @@ namespace CommerceClone.Interfaces
         DbSet<Store> Stores { get; set; }
         DbSet<Admin> Admins { get; set; }
         DbSet<Cart> Carts { get; set; }
+        DbSet<CartItem> CartItems { get; set; }
 
         int SaveChanges();
         DbSet<TEntity> Set<TEntity>() where TEntity : class;

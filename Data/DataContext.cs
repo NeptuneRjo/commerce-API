@@ -11,7 +11,7 @@ namespace CommerceClone.Data
 
         public DbSet<Item> Items { get; set; }
         public DbSet<Store> Stores { get; set; }
-        //public DbSet<User> Users { get; set; }
+        public DbSet<CartItem> CartItems { get; set; }
         public DbSet<Admin> Admins { get; set; }
         public DbSet<Cart> Carts { get; set; }
 
@@ -31,7 +31,7 @@ namespace CommerceClone.Data
 
             // CartItems
             modelBuilder.Entity<Cart>()
-                .HasMany(e => e.Items)
+                .HasMany(e => e.CartItems)
                 .WithOne(e => e.Cart)
                 .HasForeignKey(e => e.CartId);
 
