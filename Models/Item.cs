@@ -1,8 +1,11 @@
-﻿namespace CommerceClone.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace CommerceClone.Models
 {
     public class Item
     {
-        public int Id { get; set; }
+        [Key]
+        public string Id { get; set; }
         public string Name { get; set; }
         public decimal Price { get; set; }
         public string Description { get; set; }
@@ -10,9 +13,9 @@
         public int Count { get; set; }
 
         public Store Store { get; set; }
-        public int StoreId { get; set; }
+        public string StoreId { get; set; }
 
-        public Cart Cart { get; set; }
-        public int CartId { get; set; }
+        public CartItem CartItem { get; set; }
+        public string CartItemId { get; set; }
     }
 }
