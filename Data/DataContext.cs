@@ -9,38 +9,24 @@ namespace CommerceClone.Data
         public DataContext() { }
         public DataContext(DbContextOptions<DataContext> options) : base(options) { }
 
-        public DbSet<Item> Items { get; set; }
-        public DbSet<Store> Stores { get; set; }
-        public DbSet<CartItem> CartItems { get; set; }
         public DbSet<Admin> Admins { get; set; }
+
         public DbSet<Cart> Carts { get; set; }
+        public DbSet<CartItem> CartItems { get; set; }
+
+        public DbSet<Item> Items { get; set; }
+
+        public DbSet<Store> Stores { get; set; }
+
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // StoreItems
-            modelBuilder.Entity<Store>()
-                .HasMany(e => e.Items)
-                .WithOne(e => e.Store)
-                .HasForeignKey(e => e.StoreId);
-
-            // StoreCarts
-            modelBuilder.Entity<Store>()
-                .HasMany(e => e.Carts)
-                .WithOne(e => e.Store)
-                .HasForeignKey(e => e.StoreId);
-
-            // CartItems
-            modelBuilder.Entity<Cart>()
-                .HasMany(e => e.CartItems)
-                .WithOne(e => e.Cart)
-                .HasForeignKey(e => e.CartId);
-
-            // AdminStores
-            modelBuilder.Entity<Admin>()
-                .HasMany(e => e.Stores)
-                .WithOne(e => e.Admin)
-                .HasForeignKey(e => e.AdminId);
+            modelBuilder.Entity<CartItem>()
+                .HasOne(e => e.Item)
+                .WithMany()
+                .HasForeignKey(e => e.ItemId)
+                .OnDelete(DeleteBehavior.NoAction);
         }
-
     }
 }
