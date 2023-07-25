@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace CommerceClone.Models
 {
@@ -13,11 +14,11 @@ namespace CommerceClone.Models
         public string PublicKey { get; set; }
 
         [JsonPropertyName("stores")]
-        public ICollection<Store> Stores{ get; set; }
+        public ICollection<Store>? Stores{ get; set; }
 
         public Admin()
         {
-            //Stores = new List<Store>();
+            Stores = new List<Store>();
             PublicKey = "";
             SecretKey = "";
         }

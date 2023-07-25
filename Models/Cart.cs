@@ -6,13 +6,13 @@ namespace CommerceClone.Models
     {
         public int Id { get; set; }
         [JsonPropertyName("total_items")]
-        public int TotalItems { get; set; }
+        public int? TotalItems { get; set; }
         [JsonPropertyName("total_unique_items")]
-        public int TotalUniqueItems { get; set; }
-        public string Subtotal { get; set; }
+        public int? TotalUniqueItems { get; set; }
+        public string? Subtotal { get; set; }
 
         [JsonPropertyName("cart_items")]
-        public ICollection<CartItem> CartItems { get; set; }
+        public ICollection<CartItem>? CartItems { get; set; }
 
         public Store Store { get; set; }
 

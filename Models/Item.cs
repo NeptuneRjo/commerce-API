@@ -11,6 +11,6 @@ namespace CommerceClone.Models
         public byte[] Image { get; set; }
         public int Count { get; set; }
 
-        public Store Store { get; set; }
+        public Store? Store { get; set; }
     }
 }
