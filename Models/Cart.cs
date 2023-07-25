@@ -1,19 +1,20 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Text.Json.Serialization;
 
 namespace CommerceClone.Models
 {
     public class Cart
     {
-        [Key]
-        public string Id { get; set; }
+        public int Id { get; set; }
+        [JsonPropertyName("total_items")]
         public int TotalItems { get; set; }
+        [JsonPropertyName("total_unique_items")]
         public int TotalUniqueItems { get; set; }
         public string Subtotal { get; set; }
 
-        public Store Store { get; set; }
-        public string StoreId { get; set; }
-
+        [JsonPropertyName("cart_items")]
         public ICollection<CartItem> CartItems { get; set; }
+
+        public Store Store { get; set; }
 
         public Cart()
         {
@@ -21,7 +22,7 @@ namespace CommerceClone.Models
 
             TotalItems = CartItems.Count();
 
-            TotalUniqueItems = CartItems.GroupBy(e => e.Id)
+            TotalUniqueItems = CartItems.GroupBy(e => e.ItemId)
                 .Select(group => new { Id = group.Key, Count = group.Count() })
                 .ToList()
                 .Count();

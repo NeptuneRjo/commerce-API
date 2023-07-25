@@ -1,17 +1,17 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace CommerceClone.Models
+﻿namespace CommerceClone.Models
 {
     public class CartItem
     {
-        [Key]
-        public string Id { get; set; }
-        public Item Item { get; set; }
-        public int Quantity { get; set; }
-        public decimal Total { get; set; }
+        public int Id { get; set; }
+
+        public int CartId { get; set; }
+        public int ItemId { get; set; }
 
         public Cart Cart { get; set; }
-        public string CartId { get; set; }
+        public Item Item { get; set; }
+
+        public int Quantity { get; set; }
+        public decimal Total { get; set; }
 
         public CartItem()
         {
