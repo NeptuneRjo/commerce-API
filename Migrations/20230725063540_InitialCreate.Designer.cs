@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CommerceClone.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20230723002051_Initial2")]
-    partial class Initial2
+    [Migration("20230725063540_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -42,11 +42,13 @@ namespace CommerceClone.Migrations
 
                     b.Property<string>("PublicKey")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(max)")
+                        .HasAnnotation("Relational:JsonPropertyName", "public_key");
 
                     b.Property<string>("SecretKey")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(max)")
+                        .HasAnnotation("Relational:JsonPropertyName", "secret_key");
 
                     b.HasKey("Id");
 
@@ -55,22 +57,26 @@ namespace CommerceClone.Migrations
 
             modelBuilder.Entity("CommerceClone.Models.Cart", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
 
-                    b.Property<string>("StoreId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("StoreId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Subtotal")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("TotalItems")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasAnnotation("Relational:JsonPropertyName", "total_items");
 
                     b.Property<int>("TotalUniqueItems")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasAnnotation("Relational:JsonPropertyName", "total_unique_items");
 
                     b.HasKey("Id");
 
@@ -81,12 +87,17 @@ namespace CommerceClone.Migrations
 
             modelBuilder.Entity("CommerceClone.Models.CartItem", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
 
-                    b.Property<string>("CartId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CartId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ItemId")
+                        .HasColumnType("int");
 
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
@@ -98,17 +109,20 @@ namespace CommerceClone.Migrations
 
                     b.HasIndex("CartId");
 
+                    b.HasIndex("ItemId");
+
                     b.ToTable("CartItems");
+
+                    b.HasAnnotation("Relational:JsonPropertyName", "cart_items");
                 });
 
             modelBuilder.Entity("CommerceClone.Models.Item", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
 
-                    b.Property<string>("CartItemId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int>("Count")
                         .HasColumnType("int");
@@ -128,14 +142,10 @@ namespace CommerceClone.Migrations
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<string>("StoreId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("StoreId")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("CartItemId")
-                        .IsUnique();
 
                     b.HasIndex("StoreId");
 
@@ -144,8 +154,11 @@ namespace CommerceClone.Migrations
 
             modelBuilder.Entity("CommerceClone.Models.Store", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int>("AdminId")
                         .HasColumnType("int");
@@ -163,6 +176,8 @@ namespace CommerceClone.Migrations
                     b.HasIndex("AdminId");
 
                     b.ToTable("Stores");
+
+                    b.HasAnnotation("Relational:JsonPropertyName", "stores");
                 });
 
             modelBuilder.Entity("CommerceClone.Models.Cart", b =>
@@ -184,24 +199,24 @@ namespace CommerceClone.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("CommerceClone.Models.Item", "Item")
+                        .WithMany()
+                        .HasForeignKey("ItemId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
                     b.Navigation("Cart");
+
+                    b.Navigation("Item");
                 });
 
             modelBuilder.Entity("CommerceClone.Models.Item", b =>
                 {
-                    b.HasOne("CommerceClone.Models.CartItem", "CartItem")
-                        .WithOne("Item")
-                        .HasForeignKey("CommerceClone.Models.Item", "CartItemId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("CommerceClone.Models.Store", "Store")
                         .WithMany("Items")
                         .HasForeignKey("StoreId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("CartItem");
 
                     b.Navigation("Store");
                 });
@@ -225,12 +240,6 @@ namespace CommerceClone.Migrations
             modelBuilder.Entity("CommerceClone.Models.Cart", b =>
                 {
                     b.Navigation("CartItems");
-                });
-
-            modelBuilder.Entity("CommerceClone.Models.CartItem", b =>
-                {
-                    b.Navigation("Item")
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("CommerceClone.Models.Store", b =>
