@@ -10,6 +10,18 @@ namespace CommerceClone.Controllers
 {
     using BCrypt.Net;
 
+    public class OAuthBody
+    {
+        public string Provider { get; set; }
+        public string Redirect { get; set; }
+    }
+
+    public class EmailBody
+    {
+        public string Email { get; set; }
+        public string Password { get; set; }
+    }
+
     [ApiController]
     [Route("v1/auth")]
     public class AuthenticationController : ControllerBase
@@ -22,65 +34,77 @@ namespace CommerceClone.Controllers
         }
 
         [HttpGet]
-        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult> Providers()
         {
-            return Ok(await HttpContext.GetExternalProvidersAsync());
-        }
+            var providers = new List<Dictionary<string, string>>();
 
-        [HttpPost("/oauth")]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult> OAuth([FromForm] string provider)
-        {
-            if (string.IsNullOrWhiteSpace(provider))
-                return BadRequest();
-
-            if (!await HttpContext.IsProviderSupportedAsync(provider))
-                return BadRequest();
-
-            return Challenge(new AuthenticationProperties { RedirectUri = "/" }, provider);
-        }
-
-        [HttpPost("/email/admin")]
-        public async Task<ActionResult> AdminEmail(Admin admin)
-        {
-            if (ModelState.IsValid)
+            foreach (var provider in await HttpContext.GetExternalProvidersAsync())
             {
-                var foundAdmin = _admin.GetByEmail(admin.Email);
-
-                if (foundAdmin == null)
-                    return BadRequest("No admin with those credentials found.");
-
-                if (BCrypt.Verify(admin.Password, foundAdmin.Password))
-                {
-                    var identity = new ClaimsIdentity(CookieAuthenticationDefaults.AuthenticationScheme, ClaimTypes.Name, ClaimTypes.Role);
-                    identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, admin.Email));
-                    identity.AddClaim(new Claim(ClaimTypes.Name, admin.Email));
-
-                    var principal = new ClaimsPrincipal(identity);
-
-                    await HttpContext.SignInAsync(
-                        CookieAuthenticationDefaults.AuthenticationScheme,
-                        principal,
-                        new AuthenticationProperties
-                        {
-                            IsPersistent = true,
-                            AllowRefresh = true,
-                            ExpiresUtc = DateTime.UtcNow.AddDays(1),
-                            RedirectUri = "/"
-                        }
-                    );
-
-                    return Ok();
-                }
-                return BadRequest();
+                providers.Add(new Dictionary<string, string>()
+            {
+                { "Name", provider.Name },
+                { "DisplayName", provider.DisplayName }
+            });
             }
 
-            return BadRequest();
+            return Ok(providers);
         }
 
-        [HttpGet("/signout")]
-        [HttpPost("/signout")]
+        [HttpPost("oauth")]
+        public async Task<ActionResult> OAuth(OAuthBody body)
+        {
+            if (string.IsNullOrWhiteSpace(body.Provider))
+                return BadRequest("No provider specified");
+
+            if (string.IsNullOrWhiteSpace(body.Redirect))
+                return BadRequest("No redirect url specified");
+
+            if (!await HttpContext.IsProviderSupportedAsync(body.Provider))
+                return BadRequest("Provider not supported");
+
+            return Challenge(new AuthenticationProperties { RedirectUri = body.Redirect }, body.Provider);
+        }
+
+        [HttpPost("email")]
+        public async Task<ActionResult> Email(EmailBody body)
+        {
+            if (string.IsNullOrWhiteSpace(body.Email))
+                return BadRequest("No email provided");
+
+            if (string.IsNullOrWhiteSpace(body.Password))
+                return BadRequest("No password provided");
+
+            Admin admin = _admin.GetByEmail(body.Email);
+
+            if (admin == null)
+                return BadRequest("No admin with those credentials found");
+
+            if (BCrypt.Verify(body.Password, admin.Password))
+            {
+                var identity = new ClaimsIdentity(CookieAuthenticationDefaults.AuthenticationScheme, ClaimTypes.Name, ClaimTypes.Role);
+                identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, body.Email));
+                identity.AddClaim(new Claim(ClaimTypes.Name, body.Email));
+
+                var principal = new ClaimsPrincipal(identity);
+
+                await HttpContext.SignInAsync(
+                    CookieAuthenticationDefaults.AuthenticationScheme,
+                    principal,
+                    new AuthenticationProperties
+                    {
+                        IsPersistent = true,
+                        AllowRefresh = true,
+                        ExpiresUtc = DateTime.UtcNow.AddDays(1),
+                        RedirectUri = "/"
+                    }
+                );
+                return Ok();
+            }
+            return BadRequest("Failed to authenticate admin");
+        }
+
+        [HttpGet("signout")]
+        [HttpPost("signout")]
         public ActionResult SignOutUser()
         {
             return SignOut(new AuthenticationProperties { RedirectUri = "/" },
