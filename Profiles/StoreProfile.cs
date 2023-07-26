@@ -10,7 +10,8 @@ namespace CommerceClone.Profiles
         public StoreProfile()
         {
             CreateMap<Store, StoreDto>();
-            CreateMap<StoreModel, Store>();
+            CreateMap<StoreModel, Store>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore());
         }
     }
 }
