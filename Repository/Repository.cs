@@ -1,5 +1,7 @@
-﻿using CommerceClone.Interfaces;
+﻿using AutoMapper;
+using CommerceClone.Interfaces;
 using CommerceClone.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace CommerceClone.Repository
 {
@@ -10,10 +12,12 @@ namespace CommerceClone.Repository
     public class Repository<TEntity> : IRepository<TEntity> where TEntity : class
     {
         private readonly IDataContext _context;
+        private readonly IMapper _mapper;
 
-        public Repository(IDataContext context)
+        public Repository(IDataContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         public TEntity Add(TEntity entity)
@@ -34,21 +38,20 @@ namespace CommerceClone.Repository
             return _context.Set<TEntity>().ToList();
         }
 
-        public TEntity GetById(string id)
+        public TEntity GetById(int id)
         {
             return _context.Set<TEntity>().Find(id);
         }
 
-        public void Update(string id, TEntity entity)
+        public void Update(int id, TEntity entity)
         {
             var foundEntity = _context.Set<TEntity>().Find(id);
 
             _context.Set<TEntity>().Entry(foundEntity).CurrentValues.SetValues(entity);
             _context.SaveChanges();
-            //_context.Set<TEntity>().Update(entity);
         }
 
-        public void Delete(string id)
+        public void Delete(int id)
         {
             var entity = _context.Set<TEntity>().Find(id);
 
@@ -66,6 +69,16 @@ namespace CommerceClone.Repository
             } while (_context.Set<TEntity>().Find($"{marker.ToLower()}_{id}") != null);
 
             return id;
+        }
+
+        public void SaveChanges()
+        {
+            _context.SaveChanges();
+        }
+
+        public T Map<T>(dynamic entity)
+        {
+            return _mapper.Map<T>(entity);
         }
     }
 }
