@@ -3,15 +3,18 @@ using CommerceClone.Models;
 
 namespace CommerceClone.Repository
 {
+    using AutoMapper;
     using BCrypt.Net;
 
     public class AdminRepository : Repository<Admin>, IAdminRepository
     {
         private readonly IDataContext _context;
+        private readonly IMapper _mapper;
 
-        public AdminRepository(IDataContext context) : base(context)
+        public AdminRepository(IDataContext context, IMapper mapper) : base(context, mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         public Admin GenerateKeys(Admin admin)

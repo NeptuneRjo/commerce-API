@@ -1,4 +1,5 @@
-﻿using CommerceClone.Interfaces;
+﻿using AutoMapper;
+using CommerceClone.Interfaces;
 using CommerceClone.Models;
 
 namespace CommerceClone.Repository
@@ -7,13 +8,15 @@ namespace CommerceClone.Repository
     {
 
         private readonly IDataContext _context;
+        private readonly IMapper _mapper;
 
-        public CartRepository(IDataContext context) : base(context)
+        public CartRepository(IDataContext context, IMapper mapper) : base(context, mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
-        public Cart AddItem(Cart cart, string itemId, int quantity)
+        public Cart AddItem(Cart cart, int itemId, int quantity)
         {
             var item = _context.Items.Find(itemId);
             var cartItem = new CartItem()
@@ -39,7 +42,7 @@ namespace CommerceClone.Repository
             return cart;
         }
 
-        public ICollection<CartItem> RemoveItem(ICollection<CartItem> items, string itemId, int quantity)
+        public ICollection<CartItem> RemoveItem(ICollection<CartItem> items, int itemId, int quantity)
         {
             var item = items.First(e => e.Item.Id == itemId);
 
