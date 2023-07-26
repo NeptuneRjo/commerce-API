@@ -1,42 +1,49 @@
-﻿using CommerceClone.Interfaces;
+﻿using CommerceClone.DTO;
+using CommerceClone.Interfaces;
 using CommerceClone.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace CommerceClone.Controllers
 {
+
     [ApiController]
     [Route("v1/stores")]
+    [Authorize]
     public class StoreController : ControllerBase
     {
         private readonly IStoreRepository _store;
-        private readonly IAdminRepository _admin;
 
-        public StoreController(IStoreRepository storeRepository, IAdminRepository admin)
+        public StoreController(IStoreRepository storeRepository)
         {
             _store = storeRepository;
-            _admin = admin;
         }
 
         // POST: v1/stores
         [HttpPost]
-        public ActionResult CreateStore(Store store)
+        [AllowAnonymous]
+        [ProducesResponseType(200, Type = typeof(StoreDto))]
+        [ProducesResponseType(400)]
+        public ActionResult CreateStore(StoreModel storeModel)
         {
             if (!ModelState.IsValid)
-                return BadRequest();
+                return BadRequest(ModelState);
 
             try
             {
-                var key = Request.Headers["X-Authorization"];
-                var admin = _admin.GetBySk(key);
+                string key = Request.Headers["X-Authorization"];
 
-                if (admin == null)
-                    return NotFound();
+                Store store = _store.Map<Store>(storeModel);
 
-                store.AdminId = admin.Id;
+                _store.AddByKey(key, store);
 
-                _store.Add(store);
+                StoreDto dto = _store.Map<StoreDto>(store);
 
-                return Ok(store);
+                dto.Items = _store.Map<ICollection<ItemDto>>(dto.Items);
+                dto.Carts = _store.Map<ICollection<CartDto>>(dto.Carts);
+
+                return Ok(dto);
             }
             catch (Exception ex)
             {
@@ -46,19 +53,29 @@ namespace CommerceClone.Controllers
 
         // GET: v1/stores
         [HttpGet]
+        [AllowAnonymous]
+        [ProducesResponseType(200, Type = typeof(ICollection<StoreDto>))]
+        [ProducesResponseType(400)]
         public ActionResult GetStores()
         {
             try
             {
-                var key = Request.Headers["X-Authorization"];
-                var admin = _admin.GetByPk(key);
+                string key = Request.Headers["X-Authorization"];
+                string email = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-                if (admin == null)
-                    return NotFound();
+                ICollection<Store> stores = string.IsNullOrEmpty(key)
+                    ? _store.GetAllByEmail(email)
+                    : _store.GetAllByPk(key);
 
-                var stores = admin.Stores.ToList();
+                ICollection<StoreDto> dtos = _store.Map<ICollection<StoreDto>>(stores);
 
-                return Ok(stores);
+                foreach (var store in dtos)
+                {
+                    store.Carts = _store.Map<ICollection<CartDto>>(store.Carts);
+                    store.Items = _store.Map<ICollection<ItemDto>>(store.Items);
+                }
+
+                return Ok(dtos);
             }
             catch (Exception ex)
             {
@@ -67,21 +84,32 @@ namespace CommerceClone.Controllers
         }
 
         // GET: v1/stores/{store_id}
-        [HttpGet("/{storeId}")]
-        public ActionResult GetStoreById(string storeId)
+        [HttpGet("{storeId}")]
+        [AllowAnonymous]
+        [ProducesResponseType(200, Type = typeof(StoreDto))]
+        [ProducesResponseType(400)]
+        public ActionResult GetStoreById(int storeId)
         {
             try
             {
-                var key = Request.Headers["X-Authorization"];
-                var store = _store.GetById(storeId);
+                string key = Request.Headers["X-Authorization"];
+                string email = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+                Store store = _store.GetById(storeId);
 
                 if (store == null)
                     return NotFound();
 
-                if (store.Admin.PublicKey != key)
+                // If key is defined, check auth
+                if (!string.IsNullOrEmpty(key) && store.Admin.PublicKey != key)
+                    return Unauthorized();
+                // If email is defined, check auth
+                if (!string.IsNullOrEmpty(email) && store.Admin.Email != email)
                     return Unauthorized();
 
-                return Ok(store);
+                StoreDto dto = _store.Map<StoreDto>(store);
+
+                return Ok(dto);
             }
             catch (Exception ex)
             {
@@ -90,26 +118,46 @@ namespace CommerceClone.Controllers
         }
 
         // PUT: v1/stores/{store_id}
-        [HttpPut("/{storeId}")]
-        public ActionResult UpdateStore(string storeId, Store update)
+        [HttpPut("{storeId}")]
+        [AllowAnonymous]
+        [ProducesResponseType(200, Type = typeof(StoreDto))]
+        [ProducesResponseType(400)]
+        public ActionResult UpdateStore(int storeId, StoreModel storeModel)
         {
             if (!ModelState.IsValid)
                 return BadRequest();
 
             try
             {
-                var key = Request.Headers["X-Authorization"];
-                var store = _store.GetById(storeId);
+                string key = Request.Headers["X-Authorization"];
+                string email = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+               
+                Store store = _store.GetById(storeId);
 
                 if (store == null)
                     return NotFound();
 
-                if (store.Admin.SecretKey != key)
+                // If key is defined, check auth
+                if (!string.IsNullOrEmpty(key) && store.Admin.SecretKey != key)
+                    return Unauthorized();
+                // If email is defined, check auth
+                if (!string.IsNullOrEmpty(email) && store.Admin.Email != email)
                     return Unauthorized();
 
-                _store.Update(storeId, update);
-               
-                return Ok(store);
+                if (storeModel.Name != null)
+                    store.Name = storeModel.Name;
+
+                if (storeModel.Description != null)
+                    store.Description = storeModel.Description;
+
+                _store.Update(storeId, store);
+
+                StoreDto dto = _store.Map<StoreDto>(store);
+
+                dto.Items = _store.Map<ICollection<ItemDto>>(dto.Items);
+                dto.Carts = _store.Map<ICollection<CartDto>>(dto.Carts);
+
+                return Ok(dto);
             }
             catch (Exception ex)
             {
@@ -118,18 +166,27 @@ namespace CommerceClone.Controllers
         }
 
         // DELETE: v1/stores/{store_id}
-        [HttpDelete("/{storeId}")]
-        public ActionResult DeleteStore(string storeId)
+        [HttpDelete("{storeId}")]
+        [AllowAnonymous]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        public ActionResult DeleteStore(int storeId)
         {
             try
             {
-                var key = Request.Headers["X-Authorization"];
-                var store = _store.GetById(storeId);
+                string key = Request.Headers["X-Authorization"];
+                string email = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+                Store store = _store.GetById(storeId);
 
                 if (store == null)
                     return NotFound();
 
-                if (store.Admin.SecretKey != key)
+                // If key is defined, check auth
+                if (!string.IsNullOrEmpty(key) && store.Admin.SecretKey != key)
+                    return Unauthorized();
+                // If email is defined, check auth
+                if (!string.IsNullOrEmpty(email) && store.Admin.Email != email)
                     return Unauthorized();
 
                 _store.Delete(storeId);
