@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using CommerceClone.Controllers;
 using CommerceClone.DTO;
 using CommerceClone.Models;
 
@@ -9,6 +10,7 @@ namespace CommerceClone.Profiles
         public StoreProfile()
         {
             CreateMap<Store, StoreDto>();
+            CreateMap<StoreModel, Store>();
         }
     }
 }
