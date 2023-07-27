@@ -3,9 +3,20 @@ using CommerceClone.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
+using System.Text.Json.Serialization;
+using CommerceClone.DTO;
+
 
 namespace CommerceClone.Controllers
 {
+    using BCrypt.Net;
+    public class UpdatePasswordBody
+    {
+        public string Password { get; set; }
+        [JsonPropertyName("update_password")]
+        public string UpdatePassword { get; set; }
+    }
+
     [ApiController]
     [Route("v1/admin")]
     public class AdminController : ControllerBase
@@ -19,19 +30,30 @@ namespace CommerceClone.Controllers
 
         // POST: v1/admin
         [HttpPost]
-        public ActionResult CreateAdmin(Admin admin)
+        public ActionResult CreateAdmin(AdminModel adminModel)
         {
             if (!ModelState.IsValid)
                 return BadRequest();
 
+            if (_admin.GetByEmail(adminModel.Email) != null)
+                return BadRequest("An admin with this email already exists");
+
             try
             {
+                Admin admin = _admin.Map<Admin>(adminModel);
+
                 admin = _admin.GenerateKeys(admin);
                 admin.Password = _admin.EncryptPass(admin.Password);
 
+                if (admin.Stores == null)
+                    admin.Stores = new List<Store>();
+                
                 _admin.Add(admin);
 
-                return Ok();
+                AdminDto dto = _admin.Map<AdminDto>(admin);
+                dto.Stores = _admin.Map<ICollection<StoreDto>>(dto.Stores);
+
+                return Ok(dto);
             }
             catch (Exception ex)
             {
@@ -46,13 +68,16 @@ namespace CommerceClone.Controllers
         {
             try
             {
-                var email = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                var admin = _admin.GetByEmail(email);
+                string email = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                Admin admin = _admin.GetByEmail(email);
 
                 if (admin == null)
-                    return NotFound();
+                    return NotFound("No admin with these credentials found");
 
-                return Ok(admin);
+                AdminDto dto = _admin.Map<AdminDto>(admin);
+                dto.Stores = _admin.Map<ICollection<StoreDto>>(dto.Stores);
+
+                return Ok(dto);
             }
             catch (Exception ex)
             {
@@ -63,22 +88,32 @@ namespace CommerceClone.Controllers
         // PUT: v1/admin
         [Authorize]
         [HttpPut]
-        public ActionResult UpdateAdmin(Admin update) 
+        public ActionResult UpdatePassword([FromBody] UpdatePasswordBody body) 
         { 
             if (!ModelState.IsValid)
                 return BadRequest();
 
             try
             {
-                var email = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                var admin = _admin.GetByEmail(email);
+                string email = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                Admin admin = _admin.GetByEmail(email);
 
                 if (admin == null)
                     return NotFound();
 
-                _admin.Update(admin.Id.ToString(), update);
+                if (BCrypt.Verify(body.Password, admin.Password)) 
+                {
+                    admin.Password = _admin.EncryptPass(body.UpdatePassword);
 
-                return Ok();
+                    _admin.Update(admin.Id, admin);
+
+                    AdminDto dto = _admin.Map<AdminDto>(admin);
+                    dto.Stores = _admin.Map<ICollection<StoreDto>>(dto.Stores);
+
+                    return Ok(dto);
+                }
+
+                return BadRequest("Credentials do not match");
             }
             catch (Exception ex)
             {
@@ -93,11 +128,11 @@ namespace CommerceClone.Controllers
         {
             try
             {
-                var email = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                var admin = _admin.GetByEmail(email);
+                string email = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                Admin admin = _admin.GetByEmail(email);
 
                 if (admin == null)
-                    return NotFound();
+                    return NotFound("No admin with these credentials found");
 
                 _admin.Delete(admin.Id);
 
