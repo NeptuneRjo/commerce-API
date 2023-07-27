@@ -27,6 +27,24 @@ namespace CommerceClone.Data
                 .WithMany()
                 .HasForeignKey(e => e.ItemId)
                 .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<Admin>()
+                .HasMany(e => e.Stores)
+                .WithOne(e => e.Admin)
+                .HasForeignKey(e => e.AdminId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Store>()
+                .HasMany(e => e.Items)
+                .WithOne(e => e.Store)
+                .HasForeignKey(e => e.StoreId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Cart>()
+                .HasMany(e => e.CartItems)
+                .WithOne(e => e.Cart)
+                .HasForeignKey(e => e.CartId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }
