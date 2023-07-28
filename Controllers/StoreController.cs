@@ -16,6 +16,9 @@ namespace CommerceClone.Controllers
     {
         private readonly IStoreRepository _store;
 
+        // All of Store's reference/child objects for querying
+        private readonly Expression<Func<Store, object>>[] includes = { e => e.Carts, e => e.Items, e => e.Admin };
+
         public StoreController(IStoreRepository storeRepository)
         {
             _store = storeRepository;
@@ -67,7 +70,6 @@ namespace CommerceClone.Controllers
                 Expression<Func<Store, bool>> query = string.IsNullOrEmpty(key)
                     ? e => e.Admin.Email == email
                     : e => e.Admin.PublicKey == key;
-                Expression<Func<Store, object>>[] includes = { e => e.Items, e => e.Carts };
 
                 ICollection<Store> stores = _store.GetAllByQuery(query, includes);
                 ICollection<StoreDto> dtos = _store.Map<ICollection<StoreDto>>(stores);
@@ -98,7 +100,6 @@ namespace CommerceClone.Controllers
                 string key = Request.Headers["X-Authorization"];
                 string email = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-                Expression<Func<Store, object>>[] includes = { e => e.Carts, e => e.Items };
                 Store store = _store.GetByQuery(e => e.Id == storeId, includes);
 
                 if (store == null)
@@ -117,6 +118,7 @@ namespace CommerceClone.Controllers
             }
             catch (Exception ex)
             {
+                Console.WriteLine(ex);
                 return BadRequest(ex.Message);
             }
         }
@@ -136,7 +138,6 @@ namespace CommerceClone.Controllers
                 string key = Request.Headers["X-Authorization"];
                 string email = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-                Expression<Func<Store, object>>[] includes = { e => e.Carts, e => e.Items, e => e.Admin };
                 Store store = _store.GetByQuery(e => e.Id == storeId, includes);
 
                 if (store == null)
@@ -182,7 +183,7 @@ namespace CommerceClone.Controllers
                 string key = Request.Headers["X-Authorization"];
                 string email = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-                Store store = _store.GetByQuery(e => e.Id == storeId);
+                Store store = _store.GetByQuery(e => e.Id == storeId, includes);
 
                 if (store == null)
                     return NotFound();
