@@ -53,7 +53,6 @@ namespace CommerceClone.Controllers
                 _admin.Add(admin);
 
                 AdminDto dto = _admin.Map<AdminDto>(admin);
-                dto.Stores = _admin.Map<ICollection<StoreDto>>(dto.Stores);
 
                 return Ok(dto);
             }
@@ -78,7 +77,6 @@ namespace CommerceClone.Controllers
                     return NotFound("No admin with these credentials found");
 
                 AdminDto dto = _admin.Map<AdminDto>(admin);
-                dto.Stores = _admin.Map<ICollection<StoreDto>>(dto.Stores);
 
                 return Ok(dto);
             }
@@ -112,7 +110,6 @@ namespace CommerceClone.Controllers
                     _admin.Update(admin.Id, admin);
 
                     AdminDto dto = _admin.Map<AdminDto>(admin);
-                    dto.Stores = _admin.Map<ICollection<StoreDto>>(dto.Stores);
 
                     return Ok(dto);
                 }
