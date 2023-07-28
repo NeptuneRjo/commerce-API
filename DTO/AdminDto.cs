@@ -13,7 +13,5 @@ namespace CommerceClone.DTO
 
         [JsonPropertyName("secret_key")]
         public string SecretKey { get; set; }
-
-        public ICollection<StoreDto> Stores { get; set; }
     }
 }
