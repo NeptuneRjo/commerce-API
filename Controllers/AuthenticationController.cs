@@ -74,7 +74,7 @@ namespace CommerceClone.Controllers
             if (string.IsNullOrWhiteSpace(body.Password))
                 return BadRequest("No password provided");
 
-            Admin admin = _admin.GetByEmail(body.Email);
+            Admin admin = _admin.GetByQuery(e => e.Email == email, e => e.Stores);
 
             if (admin == null)
                 return BadRequest("No admin with those credentials found");

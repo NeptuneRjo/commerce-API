@@ -1,4 +1,6 @@
-﻿using CommerceClone.Interfaces;
+﻿using AutoMapper;
+using CommerceClone.DTO;
+using CommerceClone.Interfaces;
 using CommerceClone.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -26,8 +28,8 @@ namespace CommerceClone.Controllers
 
             try
             {
-                var key = Request.Headers["X-Authorization"];
-                var store = _store.GetById(item.StoreId);
+                string key = Request.Headers["X-Authorization"];
+                Store store = _store.GetByQuery(e => e.Id == item.StoreId);
 
                 if (store == null)
                     return NotFound();
@@ -37,7 +39,9 @@ namespace CommerceClone.Controllers
 
                 _item.Add(item);
                 
-                return Ok(item);
+                ItemDto itemDto = _item.Map<ItemDto>(item);
+
+                return Ok(itemDto);
             }
             catch (Exception ex)
             {
@@ -47,12 +51,13 @@ namespace CommerceClone.Controllers
 
         // GET: v1/items
         [HttpGet]
-        public ActionResult GetItems([FromBody] string storeId)
+        public ActionResult GetItems([FromBody] int storeId)
         {
             try
             {
-                var key = Request.Headers["X-Authorization"];
-                var store = _store.GetById(storeId);
+                string key = Request.Headers["X-Authorization"];
+                Store store = _store.GetByQuery(e => e.Id == storeId);
+
 
                 if (store == null)
                     return NotFound();
@@ -62,7 +67,9 @@ namespace CommerceClone.Controllers
 
                 var items = store.Items.ToList();
 
-                return Ok(items);
+                List<ItemDto> itemDtos = _item.Map<List<ItemDto>>(items);
+
+                return Ok(itemDtos);
             }
             catch (Exception ex)
             {
@@ -71,13 +78,13 @@ namespace CommerceClone.Controllers
         }
 
         // GET: v1/items/{item_id}
-        [HttpGet("/{itemId}")]
-        public ActionResult GetItemById(string itemId)
+        [HttpGet("{itemId}")]
+        public ActionResult GetItemById(int itemId)
         {
             try
             {
-                var key = Request.Headers["X-Authorization"];
-                var item = _item.GetById(itemId);
+                string key = Request.Headers["X-Authorization"];
+                Item item = _item.GetByQuery(e => e.Id == itemId);
 
                 if (item == null)
                     return NotFound();
@@ -85,7 +92,9 @@ namespace CommerceClone.Controllers
                 if (item.Store.Admin.PublicKey != key)
                     return Unauthorized();
 
-                return Ok(item);
+                ItemDto itemDto = _item.Map<ItemDto>(item);
+
+                return Ok(itemDto);
             }
             catch (Exception ex)
             {
@@ -94,16 +103,16 @@ namespace CommerceClone.Controllers
         }
 
         // PUT: v1/items/{item_id}
-        [HttpPut("/{itemId}")]
-        public ActionResult UpdateItem(string itemId, Item update)
+        [HttpPut("{itemId}")]
+        public ActionResult UpdateItem(int itemId, Item update)
         {
             if (!ModelState.IsValid)
                 return BadRequest();
 
             try
             {
-                var key = Request.Headers["X-Authorization"];
-                var item = _item.GetById(itemId);
+                string key = Request.Headers["X-Authorization"];
+                Item item = _item.GetByQuery(e => e.Id == itemId);
 
                 if (item == null)
                     return NotFound();
@@ -113,7 +122,9 @@ namespace CommerceClone.Controllers
 
                 _item.Update(itemId, update);
 
-                return Ok(item);
+                ItemDto itemDto = _item.Map<ItemDto>(item);
+
+                return Ok(itemDto);
             }
             catch (Exception ex)
             {
@@ -122,13 +133,13 @@ namespace CommerceClone.Controllers
         }
 
         // DELETE: v1/items/{item_id}
-        [HttpDelete("/{itemId}")]
-        public ActionResult DeleteItem(string itemId)
+        [HttpDelete("{itemId}")]
+        public ActionResult DeleteItem(int itemId)
         {
             try
             {
                 var key = Request.Headers["X-Authorization"];
-                var item = _item.GetById(itemId);
+                var item = _item.GetByQuery(e => e.Id == itemId);
 
                 if (item == null)
                     return NotFound();

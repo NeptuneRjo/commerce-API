@@ -3,6 +3,7 @@ using CommerceClone.Interfaces;
 using CommerceClone.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Linq.Expressions;
 using System.Security.Claims;
 
 namespace CommerceClone.Controllers
@@ -63,10 +64,12 @@ namespace CommerceClone.Controllers
                 string key = Request.Headers["X-Authorization"];
                 string email = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-                ICollection<Store> stores = string.IsNullOrEmpty(key)
-                    ? _store.GetAllByEmail(email)
-                    : _store.GetAllByPk(key);
+                Expression<Func<Store, bool>> query = string.IsNullOrEmpty(key)
+                    ? e => e.Admin.Email == email
+                    : e => e.Admin.PublicKey == key;
+                Expression<Func<Store, object>>[] includes = { e => e.Items, e => e.Carts };
 
+                ICollection<Store> stores = _store.GetAllByQuery(query, includes);
                 ICollection<StoreDto> dtos = _store.Map<ICollection<StoreDto>>(stores);
 
                 foreach (var store in dtos)
@@ -95,7 +98,8 @@ namespace CommerceClone.Controllers
                 string key = Request.Headers["X-Authorization"];
                 string email = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-                Store store = _store.GetById(storeId);
+                Expression<Func<Store, object>>[] includes = { e => e.Carts, e => e.Items };
+                Store store = _store.GetByQuery(e => e.Id == storeId, includes);
 
                 if (store == null)
                     return NotFound();
@@ -131,8 +135,9 @@ namespace CommerceClone.Controllers
             {
                 string key = Request.Headers["X-Authorization"];
                 string email = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-               
-                Store store = _store.GetById(storeId);
+
+                Expression<Func<Store, object>>[] includes = { e => e.Carts, e => e.Items, e => e.Admin };
+                Store store = _store.GetByQuery(e => e.Id == storeId, includes);
 
                 if (store == null)
                     return NotFound();
@@ -177,7 +182,7 @@ namespace CommerceClone.Controllers
                 string key = Request.Headers["X-Authorization"];
                 string email = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-                Store store = _store.GetById(storeId);
+                Store store = _store.GetByQuery(e => e.Id == storeId);
 
                 if (store == null)
                     return NotFound();

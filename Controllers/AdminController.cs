@@ -10,6 +10,8 @@ using CommerceClone.DTO;
 namespace CommerceClone.Controllers
 {
     using BCrypt.Net;
+    using System.Linq.Expressions;
+
     public class UpdatePasswordBody
     {
         public string Password { get; set; }
@@ -69,7 +71,8 @@ namespace CommerceClone.Controllers
             try
             {
                 string email = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                Admin admin = _admin.GetByEmail(email);
+
+                Admin admin = _admin.GetByQuery(e => e.Email == email, e => e.Stores);
 
                 if (admin == null)
                     return NotFound("No admin with these credentials found");
@@ -96,7 +99,8 @@ namespace CommerceClone.Controllers
             try
             {
                 string email = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                Admin admin = _admin.GetByEmail(email);
+
+                Admin admin = _admin.GetByQuery(e => e.Email == email, e => e.Stores);
 
                 if (admin == null)
                     return NotFound();
@@ -129,7 +133,8 @@ namespace CommerceClone.Controllers
             try
             {
                 string email = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                Admin admin = _admin.GetByEmail(email);
+
+                Admin admin = _admin.GetByQuery(e => e.Email == email, e => e.Stores);
 
                 if (admin == null)
                     return NotFound("No admin with these credentials found");
