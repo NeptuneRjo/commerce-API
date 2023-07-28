@@ -8,5 +8,6 @@
         public string Description { get; set; }
         public byte[] Image { get; set; }
         public int Count { get; set; }
+        public int StoreId { get; set; }
     }
 }
