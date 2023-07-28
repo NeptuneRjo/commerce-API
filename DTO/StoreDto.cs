@@ -14,11 +14,5 @@ namespace CommerceClone.DTO
 
         [JsonPropertyName("admin_id")]
         public int AdminId { get; set; }
-
-        public StoreDto()
-        {
-            Items = new List<ItemDto>();
-            Carts = new List<CartDto>();
-        }
     }
 }
