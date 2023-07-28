@@ -17,7 +17,7 @@ namespace CommerceClone.Controllers
         private readonly IStoreRepository _store;
 
         // All of Store's reference/child objects for querying
-        private readonly Expression<Func<Store, object>>[] includes = { e => e.Carts, e => e.Items, e => e.Admin };
+        private readonly Expression<Func<Store, object>>[] includes = { e => e.Carts, e => e.Items, e => e.Admin, e => e.Carts.Select(c => c.CartItems) };
 
         public StoreController(IStoreRepository storeRepository)
         {
@@ -37,15 +37,62 @@ namespace CommerceClone.Controllers
             try
             {
                 string key = Request.Headers["X-Authorization"];
+                string email = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
                 Store store = _store.Map<Store>(storeModel);
 
-                _store.AddByKey(key, store);
+                if (!string.IsNullOrEmpty(key))
+                {
+                    _store.AddByKey(key, store);
+                } else
+                {
+
+                }
 
                 StoreDto dto = _store.Map<StoreDto>(store);
 
                 dto.Items = _store.Map<ICollection<ItemDto>>(dto.Items);
                 dto.Carts = _store.Map<ICollection<CartDto>>(dto.Carts);
+
+                return Ok(dto);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        // POST: v1/stores/{store_id}/items
+        [HttpPost("{storeId}/items")]
+        [AllowAnonymous]
+        [ProducesResponseType(200, Type = typeof(StoreDto))]
+        [ProducesResponseType(400)]
+        public ActionResult CreateItem(int storeId, ItemModel itemModel)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            try
+            {
+                string key = Request.Headers["X-Authorization"];
+                string email = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+                Item item = _store.Map<Item>(itemModel);
+                Store store = _store.GetByQuery(e => e.Id == storeId, includes);
+
+                if (store == null)
+                    return NotFound();
+
+                // If key is defined, check auth
+                if (!string.IsNullOrEmpty(key) && store.Admin.PublicKey != key)
+                    return Unauthorized();
+                // If email is defined, check auth
+                if (!string.IsNullOrEmpty(email) && store.Admin.Email != email)
+                    return Unauthorized();
+
+                store = _store.AddItem(item, store);
+
+                StoreDto dto = _store.Map<StoreDto>(itemModel);
 
                 return Ok(dto);
             }
@@ -120,6 +167,40 @@ namespace CommerceClone.Controllers
             {
                 Console.WriteLine(ex);
                 return BadRequest(ex.Message);
+            }
+        }
+
+        // GET: v1/stores/{store_id}/items
+        [HttpGet("{storeId}/items")]
+        [AllowAnonymous]
+        [ProducesResponseType(200, Type = typeof(ICollection<ItemDto>))]
+        [ProducesResponseType(400)]
+        public ActionResult GetStoreItems(int storeId)
+        {
+            try
+            {
+                string key = Request.Headers["X-Authorization"];
+                string email = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+                Store store = _store.GetByQuery(e => e.Id == storeId, includes);
+
+                if (store == null)
+                    return NotFound();
+
+                // If key is defined, check auth
+                if (!string.IsNullOrEmpty(key) && store.Admin.PublicKey != key)
+                    return Unauthorized();
+                // If email is defined, check auth
+                if (!string.IsNullOrEmpty(email) && store.Admin.Email != email)
+                    return Unauthorized();
+
+                ICollection<ItemDto> dtos = _store.Map<ICollection<ItemDto>>(store.Items);
+
+                return Ok(dtos);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
             }
         }
 
