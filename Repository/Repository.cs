@@ -2,6 +2,7 @@
 using CommerceClone.Interfaces;
 using CommerceClone.Models;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 namespace CommerceClone.Repository
 {
@@ -38,9 +39,29 @@ namespace CommerceClone.Repository
             return _context.Set<TEntity>().ToList();
         }
 
-        public TEntity GetById(int id)
+        public TEntity GetByQuery(Expression<Func<TEntity, bool>> predicate, params Expression<Func<TEntity, object>>[] includes)
         {
-            return _context.Set<TEntity>().Find(id);
+            IQueryable<TEntity> query = _context.Set<TEntity>().AsNoTracking();
+
+            foreach (var include in includes)
+            {
+                query = query.Include(include);
+            }
+
+            return query.FirstOrDefault(predicate);
+        }
+
+
+        public ICollection<TEntity> GetAllByQuery(Expression<Func<TEntity, bool>> predicate, params Expression<Func<TEntity, object>>[] includes)
+        {
+            IQueryable<TEntity> query = _context.Set<TEntity>().AsNoTracking();
+
+            foreach (var include in includes)
+            {
+                query = query.Include(include);
+            }
+
+            return query.Where(predicate).ToList();
         }
 
         public void Update(int id, TEntity entity)
