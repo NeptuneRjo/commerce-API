@@ -1,54 +1,43 @@
-﻿using CommerceClone.Interfaces;
+﻿using AutoMapper;
+using CommerceClone.DTO;
+using CommerceClone.Interfaces;
 using CommerceClone.Models;
 using Microsoft.AspNetCore.Mvc;
+using System.Linq.Expressions;
 
 namespace CommerceClone.Controllers
 {
-    public class UpdateCartBody
-    {
-        public string ItemId { get; set; }
-        public int Quantity { get; set; }
-
-        public UpdateCartBody()
-        {
-            Quantity = 1;
-        }
-    }
 
     [ApiController]
     [Route("v1/cart")]
     public class CartController : ControllerBase
     {
         private readonly ICartRepository _cart;
-        private readonly IStoreRepository _store;
 
-        public CartController(ICartRepository cart, IStoreRepository store)
+        private readonly Expression<Func<Cart, object>>[] includes = { e => e.CartItems, e => e.Store, e => e.Store.Admin };
+
+        public CartController(ICartRepository cart)
         {
             _cart = cart;
-            _store = store;
         }
 
         // POST: v1/cart
         [HttpPost]
-        public ActionResult CreateCart(Cart cart)
+        public ActionResult CreateCart(CartModel cartModel)
         {
             if (!ModelState.IsValid)
                 return BadRequest();
 
             try
             {
-                var key = Request.Headers["X-Authorization"];
-                var store = _store.GetById(cart.StoreId);
+                string key = Request.Headers["X-Authorization"];
 
-                if (store == null)
-                    return NotFound();
+                Cart cart = _cart.CreateByKey(key, cartModel.StoreId);
 
-                if (store.Admin.PublicKey != key)
-                    return Unauthorized();
+                CartDto dto = _cart.Map<CartDto>(cart);
 
-                _cart.Add(cart);
 
-                return Ok(cart);
+                return Ok(dto);
             }
             catch (Exception ex)
             {
@@ -57,13 +46,14 @@ namespace CommerceClone.Controllers
         }
 
         // GET: v1/cart/{cart_id}
-        [HttpGet("/{cartId}")]
-        public ActionResult GetCart(string cartId)
+        [HttpGet("{cartId}")]
+        public ActionResult GetCart(int cartId)
         {
             try
             {
-                var key = Request.Headers["X-Authorization"];
-                var cart = _cart.GetById(cartId);
+                string key = Request.Headers["X-Authorization"];
+
+                Cart cart = _cart.GetByQuery(e => e.Id == cartId, includes);
 
                 if (cart == null)
                     return NotFound();
@@ -71,7 +61,9 @@ namespace CommerceClone.Controllers
                 if (cart.Store.Admin.PublicKey != key)
                     return Unauthorized();
 
-                return Ok(cart);
+                CartDto cartDto = _cart.Map<CartDto>(cart);
+
+                return Ok(cartDto);
             }
             catch (Exception ex)
             {
@@ -80,16 +72,17 @@ namespace CommerceClone.Controllers
         }
 
         // POST: v1/cart/{cart_id}
-        [HttpPost("/{cartId}")]
-        public ActionResult AddItemToCart(string cartId, [FromBody] UpdateCartBody body)
+        [HttpPost("{cartId}")]
+        public ActionResult AddItemToCart(int cartId, [FromBody] UpdateCartModel body)
         {
             if (!ModelState.IsValid)
                 return BadRequest();
 
             try
             {
-                var key = Request.Headers["X-Authorization"];
-                var cart = _cart.GetById(cartId);
+                string key = Request.Headers["X-Authorization"];
+
+                Cart cart = _cart.GetByQuery(e => e.Id == cartId, includes);
 
                 if (cart == null)
                     return NotFound();
@@ -99,7 +92,9 @@ namespace CommerceClone.Controllers
 
                 cart = _cart.AddItem(cart, body.ItemId, body.Quantity);
 
-                return Ok(cart);
+                CartDto cartDto = _cart.Map<CartDto>(cart);
+
+                return Ok(cartDto);
             }
             catch (Exception ex)
             {
@@ -108,13 +103,14 @@ namespace CommerceClone.Controllers
         }
 
         // DELETE: v1/cart/{cart_id}
-        [HttpDelete("/{cartId}")]
-        public ActionResult DeleteCart(string cartId) 
+        [HttpDelete("{cartId}")]
+        public ActionResult DeleteCart(int cartId) 
         {
             try
             {
-                var key = Request.Headers["X-Authorization"];
-                var cart = _cart.GetById(cartId);
+                string key = Request.Headers["X-Authorization"];
+
+                Cart cart = _cart.GetByQuery(e => e.Id == cartId, includes);
 
                 if (cart == null)
                     return NotFound();
@@ -133,13 +129,15 @@ namespace CommerceClone.Controllers
         }
 
         // DELETE: v1/cart/{cart_id}/items
-        [HttpDelete("/{cartId}/items")]
-        public ActionResult EmptyCart(string cartId)
+        [HttpDelete("{cartId}/items")]
+        public ActionResult EmptyCart(int cartId)
         {
             try
             {
-                var key = Request.Headers["X-Authorization"];
-                var cart = _cart.GetById(cartId);
+                string key = Request.Headers["X-Authorization"];
+
+                Expression<Func<Cart, object>>[] includes = { e => e.CartItems, e => e.Store };
+                Cart cart = _cart.GetByQuery(e => e.Id == cartId, includes);
 
                 if (cart == null)
                     return NotFound();
@@ -149,7 +147,9 @@ namespace CommerceClone.Controllers
 
                 cart = _cart.ClearItems(cart);
 
-                return Ok(cart);
+                CartDto dto = _cart.Map<CartDto>(cart);
+
+                return Ok(dto);
             }
             catch (Exception ex)
             {
@@ -158,13 +158,15 @@ namespace CommerceClone.Controllers
         }
 
         // PUT: v1/cart/{cart_id}/items
-        [HttpPut("/{cartId}/items")]
-        public ActionResult UpdateItemInCart(string cartId, [FromBody] UpdateCartBody body)
+        [HttpPut("{cartId}/items")]
+        public ActionResult UpdateItemInCart(int cartId, [FromBody] UpdateCartModel body)
         {
             try
             {
-                var key = Request.Headers["X-Authorization"];
-                var cart = _cart.GetById(cartId);
+                string key = Request.Headers["X-Authorization"];
+
+                Expression<Func<Cart, object>>[] includes = { e => e.CartItems, e => e.Store };
+                Cart cart = _cart.GetByQuery(e => e.Id == cartId, includes);
 
                 if (cart == null)
                     return NotFound();
@@ -178,7 +180,9 @@ namespace CommerceClone.Controllers
                     body.Quantity
                 );
 
-                return Ok(cart);
+                CartDto cartDto = _cart.Map<CartDto>(cart);
+
+                return Ok(cartDto);
             }
             catch (Exception ex)
             {
