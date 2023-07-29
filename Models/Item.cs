@@ -12,6 +12,7 @@ namespace CommerceClone.Models
         public int Count { get; set; }
 
         public Store? Store { get; set; }
+        [JsonPropertyName("store_id")]
         public int StoreId { get; set; }
     }
 
