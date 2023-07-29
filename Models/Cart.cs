@@ -37,4 +37,10 @@ namespace CommerceClone.Models
         [JsonPropertyName("store_id")]
         public int StoreId { get; set; }
     }
+
+    public class UpdateCartModel
+    {
+        public int ItemId { get; set; }
+        public int Quantity { get; set; } = 1;
+    }
 }
