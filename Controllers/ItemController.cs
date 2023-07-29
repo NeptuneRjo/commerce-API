@@ -1,8 +1,10 @@
-﻿using AutoMapper;
-using CommerceClone.DTO;
+﻿using CommerceClone.DTO;
 using CommerceClone.Interfaces;
 using CommerceClone.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Linq.Expressions;
+using System.Security.Claims;
 
 namespace CommerceClone.Controllers
 {
@@ -11,90 +13,45 @@ namespace CommerceClone.Controllers
     public class ItemController : ControllerBase
     {
         private readonly IItemRepository _item;
-        private readonly IStoreRepository _store;
 
-        public ItemController(IItemRepository item, IStoreRepository store)
+        private readonly Expression<Func<Item, object>>[] includes = { e => e.Store.Admin, e => e.Store };
+
+        public ItemController(IItemRepository item)
         {
             _item = item;
-            _store = store;
-        }
-
-        // POST: v1/items
-        [HttpPost]
-        public ActionResult CreateItem(Item item)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest();
-
-            try
-            {
-                string key = Request.Headers["X-Authorization"];
-                Store store = _store.GetByQuery(e => e.Id == item.StoreId);
-
-                if (store == null)
-                    return NotFound();
-
-                if (store.Admin.SecretKey != key)
-                    return Unauthorized();
-
-                _item.Add(item);
-                
-                ItemDto itemDto = _item.Map<ItemDto>(item);
-
-                return Ok(itemDto);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
-
-        // GET: v1/items
-        [HttpGet]
-        public ActionResult GetItems([FromBody] int storeId)
-        {
-            try
-            {
-                string key = Request.Headers["X-Authorization"];
-                Store store = _store.GetByQuery(e => e.Id == storeId);
-
-
-                if (store == null)
-                    return NotFound();
-
-                if (store.Admin.PublicKey != key)
-                    return Unauthorized();
-
-                var items = store.Items.ToList();
-
-                List<ItemDto> itemDtos = _item.Map<List<ItemDto>>(items);
-
-                return Ok(itemDtos);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
         }
 
         // GET: v1/items/{item_id}
         [HttpGet("{itemId}")]
+        [AllowAnonymous]
+        [ProducesResponseType(200, Type = typeof(ItemDto))]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(404)]
         public ActionResult GetItemById(int itemId)
         {
             try
             {
                 string key = Request.Headers["X-Authorization"];
-                Item item = _item.GetByQuery(e => e.Id == itemId);
+                string email = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+                Item item = _item.GetByQuery(e => e.Id == itemId, includes);
+                //Store store = _store.
 
                 if (item == null)
                     return NotFound();
 
-                if (item.Store.Admin.PublicKey != key)
+                if (!string.IsNullOrEmpty(key) && item.Store.Admin.PublicKey != key)
+                    return Unauthorized();
+                // If email is defined, check auth
+                if (!string.IsNullOrEmpty(email) && item.Store.Admin.Email != email)
                     return Unauthorized();
 
-                ItemDto itemDto = _item.Map<ItemDto>(item);
+                Console.WriteLine(item.Store.Admin.Email);
 
-                return Ok(itemDto);
+                ItemDto dto = _item.Map<ItemDto>(item);
+
+                return Ok(dto);
             }
             catch (Exception ex)
             {
@@ -104,7 +61,12 @@ namespace CommerceClone.Controllers
 
         // PUT: v1/items/{item_id}
         [HttpPut("{itemId}")]
-        public ActionResult UpdateItem(int itemId, Item update)
+        [AllowAnonymous]
+        [ProducesResponseType(200, Type = typeof(ItemDto))]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(404)]
+        public ActionResult UpdateItem(int itemId, ItemModelUpdate update)
         {
             if (!ModelState.IsValid)
                 return BadRequest();
@@ -112,39 +74,62 @@ namespace CommerceClone.Controllers
             try
             {
                 string key = Request.Headers["X-Authorization"];
-                Item item = _item.GetByQuery(e => e.Id == itemId);
+                string email = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+                Item item = _item.GetByQuery(e => e.Id == itemId, includes);
 
                 if (item == null)
                     return NotFound();
 
-                if (item.Store.Admin.SecretKey != key)
+                if (!string.IsNullOrEmpty(key) && item.Store.Admin.SecretKey != key)
+                    return Unauthorized();
+                if (!string.IsNullOrEmpty(email) && item.Store.Admin.Email != email)
                     return Unauthorized();
 
-                _item.Update(itemId, update);
+                if (update.Name != null)
+                    item.Name = update.Name;
+                if (update.Description != null)
+                    item.Description = update.Description;
+                if (update.Image != null)
+                    item.Image = update.Image;
+                if (update.Count.HasValue)
+                    item.Count = update.Count.Value;
 
-                ItemDto itemDto = _item.Map<ItemDto>(item);
+                _item.Update(itemId, item);
 
-                return Ok(itemDto);
+                ItemDto dto = _item.Map<ItemDto>(item);
+
+                return Ok(dto);
             }
             catch (Exception ex)
             {
+                Console.WriteLine(ex);
                 return BadRequest(ex.Message);
             }
         }
 
         // DELETE: v1/items/{item_id}
         [HttpDelete("{itemId}")]
+        [AllowAnonymous]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(404)]
         public ActionResult DeleteItem(int itemId)
         {
             try
             {
-                var key = Request.Headers["X-Authorization"];
-                var item = _item.GetByQuery(e => e.Id == itemId);
+                string key = Request.Headers["X-Authorization"];
+                string email = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+                Item item = _item.GetByQuery(e => e.Id == itemId, includes);
 
                 if (item == null)
                     return NotFound();
 
-                if (item.Store.Admin.SecretKey != key)
+                if (!string.IsNullOrEmpty(key) && item.Store.Admin.SecretKey != key)
+                    return Unauthorized();
+                if (!string.IsNullOrEmpty(email) && item.Store.Admin.Email != email)
                     return Unauthorized();
 
                 _item.Delete(itemId);
