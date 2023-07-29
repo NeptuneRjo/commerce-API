@@ -9,6 +9,8 @@ namespace CommerceClone.Profiles
         public AdminProfile()
         {
             CreateMap<Admin, AdminDto>();
+            CreateMap<AdminModel, Admin>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore()); ;
         }
     }
 }

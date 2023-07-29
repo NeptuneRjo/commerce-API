@@ -9,6 +9,8 @@ namespace CommerceClone.Profiles
         public ItemProfile()
         {
             CreateMap<Item, ItemDto>();
+            CreateMap<ItemModel, Item>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore());
         }
     }
 }
