@@ -17,11 +17,6 @@ namespace CommerceClone.Interfaces
         ICollection<Store> GetAllByAdminId(int id);
         ICollection<Store> GetAllByPk(string pk);
         ICollection<Store> GetAllByEmail(string email);
-        /// <summary>
-        /// Store-specific method for retrieving the store with the Admin reference
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        new Store GetById(int id);
+        Store AddItem(Item item, int storeId);
     }
 }
