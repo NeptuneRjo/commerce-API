@@ -15,6 +15,7 @@ namespace CommerceClone.Models
         public ICollection<CartItem>? CartItems { get; set; }
 
         public Store Store { get; set; }
+        public int StoreId { get; set; }
 
         public Cart()
         {
@@ -29,5 +30,11 @@ namespace CommerceClone.Models
 
             Subtotal = CartItems.Sum(e => e.Total).ToString();
         }
+    }
+
+    public class CartModel
+    {
+        [JsonPropertyName("store_id")]
+        public int StoreId { get; set; }
     }
 }
