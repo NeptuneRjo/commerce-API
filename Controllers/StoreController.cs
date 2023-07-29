@@ -17,7 +17,7 @@ namespace CommerceClone.Controllers
         private readonly IStoreRepository _store;
 
         // All of Store's reference/child objects for querying
-        private readonly Expression<Func<Store, object>>[] includes = { e => e.Carts, e => e.Items, e => e.Admin, e => e.Carts.Select(c => c.CartItems) };
+        private readonly Expression<Func<Store, object>>[] includes = { e => e.Carts, e => e.Items, e => e.Admin };
 
         public StoreController(IStoreRepository storeRepository)
         {
@@ -41,18 +41,9 @@ namespace CommerceClone.Controllers
 
                 Store store = _store.Map<Store>(storeModel);
 
-                if (!string.IsNullOrEmpty(key))
-                {
-                    _store.AddByKey(key, store);
-                } else
-                {
-
-                }
+                _store.AddByKey(key, store);
 
                 StoreDto dto = _store.Map<StoreDto>(store);
-
-                dto.Items = _store.Map<ICollection<ItemDto>>(dto.Items);
-                dto.Carts = _store.Map<ICollection<CartDto>>(dto.Carts);
 
                 return Ok(dto);
             }
@@ -65,7 +56,7 @@ namespace CommerceClone.Controllers
         // POST: v1/stores/{store_id}/items
         [HttpPost("{storeId}/items")]
         [AllowAnonymous]
-        [ProducesResponseType(200, Type = typeof(StoreDto))]
+        [ProducesResponseType(200, Type = typeof(ItemDto))]
         [ProducesResponseType(400)]
         public ActionResult CreateItem(int storeId, ItemModel itemModel)
         {
@@ -77,7 +68,6 @@ namespace CommerceClone.Controllers
                 string key = Request.Headers["X-Authorization"];
                 string email = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-                Item item = _store.Map<Item>(itemModel);
                 Store store = _store.GetByQuery(e => e.Id == storeId, includes);
 
                 if (store == null)
@@ -90,9 +80,12 @@ namespace CommerceClone.Controllers
                 if (!string.IsNullOrEmpty(email) && store.Admin.Email != email)
                     return Unauthorized();
 
+                itemModel.StoreId = storeId;
+                Item item = _store.Map<Item>(itemModel);
+
                 store = _store.AddItem(item, store);
 
-                StoreDto dto = _store.Map<StoreDto>(itemModel);
+                ItemDto dto = _store.Map<ItemDto>(item);
 
                 return Ok(dto);
             }
@@ -119,13 +112,8 @@ namespace CommerceClone.Controllers
                     : e => e.Admin.PublicKey == key;
 
                 ICollection<Store> stores = _store.GetAllByQuery(query, includes);
-                ICollection<StoreDto> dtos = _store.Map<ICollection<StoreDto>>(stores);
 
-                foreach (var store in dtos)
-                {
-                    store.Carts = _store.Map<ICollection<CartDto>>(store.Carts);
-                    store.Items = _store.Map<ICollection<ItemDto>>(store.Items);
-                }
+                ICollection<StoreDto> dtos = _store.Map<ICollection<StoreDto>>(stores);
 
                 return Ok(dtos);
             }
@@ -165,7 +153,6 @@ namespace CommerceClone.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex);
                 return BadRequest(ex.Message);
             }
         }
@@ -240,9 +227,6 @@ namespace CommerceClone.Controllers
                 _store.Update(storeId, store);
 
                 StoreDto dto = _store.Map<StoreDto>(store);
-
-                dto.Items = _store.Map<ICollection<ItemDto>>(dto.Items);
-                dto.Carts = _store.Map<ICollection<CartDto>>(dto.Carts);
 
                 return Ok(dto);
             }
