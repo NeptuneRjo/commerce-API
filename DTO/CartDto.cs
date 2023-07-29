@@ -14,6 +14,7 @@ namespace CommerceClone.DTO
 
         [JsonPropertyName("cart_items")]
         public ICollection<CartItem> CartItems { get; set; }
+        [JsonPropertyName("store_id")]
         public int StoreId { get; set; }
 
         public CartDto()

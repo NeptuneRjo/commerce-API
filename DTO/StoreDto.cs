@@ -9,9 +9,6 @@ namespace CommerceClone.DTO
         public string Name { get; set; }
         public string Description { get; set; }
 
-        public ICollection<ItemDto>? Items { get; set; }
-        public ICollection<CartDto>? Carts { get; set; }
-
         [JsonPropertyName("admin_id")]
         public int AdminId { get; set; }
     }
