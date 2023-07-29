@@ -80,10 +80,9 @@ namespace CommerceClone.Controllers
                 if (!string.IsNullOrEmpty(email) && store.Admin.Email != email)
                     return Unauthorized();
 
-                itemModel.StoreId = storeId;
                 Item item = _store.Map<Item>(itemModel);
 
-                store = _store.AddItem(item, store);
+                store = _store.AddItem(item, storeId);
 
                 ItemDto dto = _store.Map<ItemDto>(item);
 
