@@ -9,7 +9,7 @@ namespace CommerceClone.Models
         public int? TotalItems { get; set; }
         [JsonPropertyName("total_unique_items")]
         public int? TotalUniqueItems { get; set; }
-        public string? Subtotal { get; set; }
+        public decimal? Subtotal { get; set; }
 
         [JsonPropertyName("cart_items")]
         public ICollection<CartItem>? CartItems { get; set; }
@@ -28,7 +28,7 @@ namespace CommerceClone.Models
                 .ToList()
                 .Count();
 
-            Subtotal = CartItems.Sum(e => e.Total).ToString();
+            Subtotal = CartItems.Sum(e => e.Total);
         }
     }
 
@@ -40,6 +40,7 @@ namespace CommerceClone.Models
 
     public class UpdateCartModel
     {
+        [JsonPropertyName("item_id")]
         public int ItemId { get; set; }
         public int Quantity { get; set; } = 1;
     }
