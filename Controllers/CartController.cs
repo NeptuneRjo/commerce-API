@@ -1,7 +1,7 @@
-﻿using AutoMapper;
-using CommerceClone.DTO;
+﻿using CommerceClone.DTO;
 using CommerceClone.Interfaces;
 using CommerceClone.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq.Expressions;
 
@@ -26,7 +26,7 @@ namespace CommerceClone.Controllers
         public ActionResult CreateCart(CartModel cartModel)
         {
             if (!ModelState.IsValid)
-                return BadRequest();
+                return BadRequest(ModelState);
 
             try
             {
@@ -35,7 +35,6 @@ namespace CommerceClone.Controllers
                 Cart cart = _cart.CreateByKey(key, cartModel.StoreId);
 
                 CartDto dto = _cart.Map<CartDto>(cart);
-
 
                 return Ok(dto);
             }
@@ -61,9 +60,11 @@ namespace CommerceClone.Controllers
                 if (cart.Store.Admin.PublicKey != key)
                     return Unauthorized();
 
-                CartDto cartDto = _cart.Map<CartDto>(cart);
+                // Verify the info is up-to-date
+                cart = _cart.UpdateInfo(cart);
+                CartDto dto = _cart.Map<CartDto>(cart);
 
-                return Ok(cartDto);
+                return Ok(dto);
             }
             catch (Exception ex)
             {
@@ -73,6 +74,7 @@ namespace CommerceClone.Controllers
 
         // POST: v1/cart/{cart_id}
         [HttpPost("{cartId}")]
+        [AllowAnonymous]
         public ActionResult AddItemToCart(int cartId, [FromBody] UpdateCartModel body)
         {
             if (!ModelState.IsValid)
@@ -90,11 +92,15 @@ namespace CommerceClone.Controllers
                 if (cart.Store.Admin.PublicKey != key)
                     return Unauthorized();
 
-                cart = _cart.AddItem(cart, body.ItemId, body.Quantity);
+                CartItem cartItem = _cart.Map<CartItem>(body);
 
-                CartDto cartDto = _cart.Map<CartDto>(cart);
+                cart = _cart.AddItem(cart, cartItem);
+                // Update item totals and subtotal
+                cart = _cart.UpdateInfo(cart);
 
-                return Ok(cartDto);
+                CartDto dto = _cart.Map<CartDto>(cart);
+
+                return Ok(dto);
             }
             catch (Exception ex)
             {
