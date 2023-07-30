@@ -5,6 +5,7 @@ namespace CommerceClone.Repository
 {
     using AutoMapper;
     using BCrypt.Net;
+    using Microsoft.EntityFrameworkCore;
 
     public class AdminRepository : Repository<Admin>, IAdminRepository
     {
@@ -34,7 +35,7 @@ namespace CommerceClone.Repository
 
         public Admin GetByEmail(string email)
         {
-            return _context.Admins.First(e => e.Email == email);
+            return _context.Admins.Include(e => e.Stores).First(e => e.Email == email);
         }
 
         public string EncryptPass(string password)
