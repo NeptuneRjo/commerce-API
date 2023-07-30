@@ -57,6 +57,24 @@ namespace CommerceClone.Repository
             return store;
         }
 
+        public Store AddItem(Item item, int storeId)
+        {
+            Store store = _context.Stores.FirstOrDefault(e => e.Id == storeId);
+
+            if (item.StoreId == null)
+                item.StoreId = store.Id;
+
+            item.Store = store;
+
+            _context.Items.Add(item);
+
+            store.Items.Add(item);
+
+            _context.SaveChanges();
+
+            return store;
+        }
+
         public ICollection<Store> GetAllByAdminId(int id)
         {
             return _context.Stores.Where(e => e.AdminId == id).ToList();
@@ -64,18 +82,12 @@ namespace CommerceClone.Repository
 
         public ICollection<Store> GetAllByEmail(string email)
         {
-            return _context.Stores.Where(e => e.Admin.Email == email).ToList();
+            return _context.Stores.Include(e => e.Admin).Include(e => e.Carts).Where(e => e.Admin.Email == email).ToList();
         }
 
         public ICollection<Store> GetAllByPk(string pk)
         {
-            return _context.Stores.Where(e => e.Admin.PublicKey == pk).ToList();
-        }
-
-        new public Store GetById(int id)
-        {
-            return _context.Stores.Include(e => e.Admin)
-                .SingleOrDefault(e => e.Id == id);
+            return _context.Stores.Include(e => e.Admin).Include(e => e.Carts).Where(e => e.Admin.PublicKey == pk).ToList();
         }
     }
 }
