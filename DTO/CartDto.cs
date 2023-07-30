@@ -13,13 +13,13 @@ namespace CommerceClone.DTO
         public string Subtotal { get; set; }
 
         [JsonPropertyName("cart_items")]
-        public ICollection<CartItem> CartItems { get; set; }
+        public ICollection<CartItemDto> CartItems { get; set; }
         [JsonPropertyName("store_id")]
         public int StoreId { get; set; }
 
         public CartDto()
         {
-            CartItems = new List<CartItem>();
+            CartItems = new List<CartItemDto>();
 
             TotalItems = CartItems.Count();
 
