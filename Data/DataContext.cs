@@ -22,11 +22,6 @@ namespace CommerceClone.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<CartItem>()
-                .HasOne(e => e.Item)
-                .WithMany()
-                .HasForeignKey(e => e.ItemId)
-                .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<Admin>()
                 .HasMany(e => e.Stores)
