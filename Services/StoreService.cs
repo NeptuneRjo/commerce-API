@@ -1,4 +1,5 @@
-﻿using CommerceClone.DTO;
+﻿using AutoMapper;
+using CommerceClone.DTO;
 using CommerceClone.Interfaces;
 using CommerceClone.Models;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
@@ -9,12 +10,14 @@ namespace CommerceClone.Services
     public class StoreService : IStoreService
     {
         private IStoreRepository _repository;
+        private IMapper _mapper;
 
         private Expression<Func<Store, object>>[] includes = { e => e.Admin };
 
-        public StoreService(IStoreRepository repository)
+        public StoreService(IStoreRepository repository, IMapper mapper)
         {
             _repository = repository;
+            _mapper = mapper;
         }
 
         /// <summary>
@@ -67,7 +70,7 @@ namespace CommerceClone.Services
                 throw new ArgumentException("Key is not valid");
 
             ICollection<Store> stores = _repository.GetAllByQuery(query, includes);
-            ICollection<StoreDto> dtos = _repository.Map<ICollection<StoreDto>>(stores);
+            ICollection<StoreDto> dtos = _mapper.Map<ICollection<StoreDto>>(stores);
         
             return dtos;
         }
@@ -79,7 +82,7 @@ namespace CommerceClone.Services
             if (!PublicAuth(key, store))
                 throw new UnauthorizedAccessException("Key is invalid");
 
-            StoreDto dto = _repository.Map<StoreDto>(store);
+            StoreDto dto = _mapper.Map<StoreDto>(store);
 
             return dto;
         }
@@ -98,7 +101,7 @@ namespace CommerceClone.Services
 
             _repository.AddItem(item, store.Id);
 
-            ItemDto dto = _repository.Map<ItemDto>(item);
+            ItemDto dto = _mapper.Map<ItemDto>(item);
             
             return dto;
         }
@@ -109,7 +112,7 @@ namespace CommerceClone.Services
             
             store = _repository.AddByKey(key, store);
 
-            StoreDto dto = _repository.Map<StoreDto>(store);
+            StoreDto dto = _mapper.Map<StoreDto>(store);
 
             return dto;
         }
@@ -125,7 +128,7 @@ namespace CommerceClone.Services
                 throw new UnauthorizedAccessException("Key is invalid");
 
             ICollection<Item> items = store.Items.ToList();
-            ICollection<ItemDto> dtos = _repository.Map<ICollection<ItemDto>>(items);
+            ICollection<ItemDto> dtos = _mapper.Map<ICollection<ItemDto>>(items);
 
             return dtos;
         }
@@ -148,7 +151,7 @@ namespace CommerceClone.Services
 
             _repository.Update(storeId, store);
 
-            StoreDto dto = _repository.Map<StoreDto>(store);
+            StoreDto dto = _mapper.Map<StoreDto>(store);
 
             return dto;
         }
