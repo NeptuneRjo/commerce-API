@@ -3,8 +3,6 @@ using CommerceClone.Interfaces;
 using CommerceClone.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Linq.Expressions;
-using System.Security.Claims;
 
 namespace CommerceClone.Controllers
 {
@@ -14,19 +12,16 @@ namespace CommerceClone.Controllers
     [Authorize]
     public class StoreController : ControllerBase
     {
-        private readonly IStoreRepository _store;
+        private readonly IStoreService _service;
 
-        // All of Store's reference/child objects for querying
-        private readonly Expression<Func<Store, object>>[] includes = { e => e.Carts, e => e.Items, e => e.Admin };
-
-        public StoreController(IStoreRepository storeRepository)
+        public StoreController(IStoreService service)
         {
-            _store = storeRepository;
+            _service = service;
         }
 
         // POST: v1/stores
+        // Takes Secret Key
         [HttpPost]
-        [AllowAnonymous]
         [ProducesResponseType(200, Type = typeof(StoreDto))]
         [ProducesResponseType(400)]
         public ActionResult CreateStore(StoreModel storeModel)
@@ -37,13 +32,8 @@ namespace CommerceClone.Controllers
             try
             {
                 string key = Request.Headers["X-Authorization"];
-                string email = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-                Store store = _store.Map<Store>(storeModel);
-
-                _store.AddByKey(key, store);
-
-                StoreDto dto = _store.Map<StoreDto>(store);
+                StoreDto dto = _service.CreateNewStore(key, storeModel);
 
                 return Ok(dto);
             }
@@ -54,8 +44,8 @@ namespace CommerceClone.Controllers
         }
 
         // POST: v1/stores/{store_id}/items
+        // Takes Secret Key
         [HttpPost("{storeId}/items")]
-        [AllowAnonymous]
         [ProducesResponseType(200, Type = typeof(ItemDto))]
         [ProducesResponseType(400)]
         public ActionResult CreateItem(int storeId, ItemModel itemModel)
@@ -66,25 +56,8 @@ namespace CommerceClone.Controllers
             try
             {
                 string key = Request.Headers["X-Authorization"];
-                string email = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-                Store store = _store.GetByQuery(e => e.Id == storeId, includes);
-
-                if (store == null)
-                    return NotFound();
-
-                // If key is defined, check auth
-                if (!string.IsNullOrEmpty(key) && store.Admin.PublicKey != key)
-                    return Unauthorized();
-                // If email is defined, check auth
-                if (!string.IsNullOrEmpty(email) && store.Admin.Email != email)
-                    return Unauthorized();
-
-                Item item = _store.Map<Item>(itemModel);
-
-                store = _store.AddItem(item, storeId);
-
-                ItemDto dto = _store.Map<ItemDto>(item);
+                ItemDto dto = _service.AddItemToStore(key, storeId, itemModel);
 
                 return Ok(dto);
             }
@@ -95,8 +68,8 @@ namespace CommerceClone.Controllers
         }
 
         // GET: v1/stores
+        // Takes Public or Secret Key
         [HttpGet]
-        [AllowAnonymous]
         [ProducesResponseType(200, Type = typeof(ICollection<StoreDto>))]
         [ProducesResponseType(400)]
         public ActionResult GetStores()
@@ -104,15 +77,8 @@ namespace CommerceClone.Controllers
             try
             {
                 string key = Request.Headers["X-Authorization"];
-                string email = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-                Expression<Func<Store, bool>> query = string.IsNullOrEmpty(key)
-                    ? e => e.Admin.Email == email
-                    : e => e.Admin.PublicKey == key;
-
-                ICollection<Store> stores = _store.GetAllByQuery(query, includes);
-
-                ICollection<StoreDto> dtos = _store.Map<ICollection<StoreDto>>(stores);
+                ICollection<StoreDto> dtos = _service.GetStores(key);
 
                 return Ok(dtos);
             }
@@ -123,8 +89,8 @@ namespace CommerceClone.Controllers
         }
 
         // GET: v1/stores/{store_id}
+        // Takes Public or Secret Key
         [HttpGet("{storeId}")]
-        [AllowAnonymous]
         [ProducesResponseType(200, Type = typeof(StoreDto))]
         [ProducesResponseType(400)]
         public ActionResult GetStoreById(int storeId)
@@ -132,23 +98,14 @@ namespace CommerceClone.Controllers
             try
             {
                 string key = Request.Headers["X-Authorization"];
-                string email = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-                Store store = _store.GetByQuery(e => e.Id == storeId, includes);
-
-                if (store == null)
-                    return NotFound();
-
-                // If key is defined, check auth
-                if (!string.IsNullOrEmpty(key) && store.Admin.PublicKey != key)
-                    return Unauthorized();
-                // If email is defined, check auth
-                if (!string.IsNullOrEmpty(email) && store.Admin.Email != email)
-                    return Unauthorized();
-
-                StoreDto dto = _store.Map<StoreDto>(store);
+                StoreDto dto = _service.GetStoreById(key, storeId);
 
                 return Ok(dto);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Unauthorized(ex.Message);
             }
             catch (Exception ex)
             {
@@ -157,8 +114,8 @@ namespace CommerceClone.Controllers
         }
 
         // GET: v1/stores/{store_id}/items
+        // Takes Public or Secret Key
         [HttpGet("{storeId}/items")]
-        [AllowAnonymous]
         [ProducesResponseType(200, Type = typeof(ICollection<ItemDto>))]
         [ProducesResponseType(400)]
         public ActionResult GetStoreItems(int storeId)
@@ -166,21 +123,8 @@ namespace CommerceClone.Controllers
             try
             {
                 string key = Request.Headers["X-Authorization"];
-                string email = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-                Store store = _store.GetByQuery(e => e.Id == storeId, includes);
-
-                if (store == null)
-                    return NotFound();
-
-                // If key is defined, check auth
-                if (!string.IsNullOrEmpty(key) && store.Admin.PublicKey != key)
-                    return Unauthorized();
-                // If email is defined, check auth
-                if (!string.IsNullOrEmpty(email) && store.Admin.Email != email)
-                    return Unauthorized();
-
-                ICollection<ItemDto> dtos = _store.Map<ICollection<ItemDto>>(store.Items);
+                ICollection<ItemDto> dtos = _service.GetStoreItems(key, storeId);
 
                 return Ok(dtos);
             }
@@ -191,8 +135,8 @@ namespace CommerceClone.Controllers
         }
 
         // PUT: v1/stores/{store_id}
+        // Takes Secret Key
         [HttpPut("{storeId}")]
-        [AllowAnonymous]
         [ProducesResponseType(200, Type = typeof(StoreDto))]
         [ProducesResponseType(400)]
         public ActionResult UpdateStore(int storeId, StoreModel storeModel)
@@ -203,29 +147,8 @@ namespace CommerceClone.Controllers
             try
             {
                 string key = Request.Headers["X-Authorization"];
-                string email = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-                Store store = _store.GetByQuery(e => e.Id == storeId, includes);
-
-                if (store == null)
-                    return NotFound();
-
-                // If key is defined, check auth
-                if (!string.IsNullOrEmpty(key) && store.Admin.SecretKey != key)
-                    return Unauthorized();
-                // If email is defined, check auth
-                if (!string.IsNullOrEmpty(email) && store.Admin.Email != email)
-                    return Unauthorized();
-
-                if (storeModel.Name != null)
-                    store.Name = storeModel.Name;
-
-                if (storeModel.Description != null)
-                    store.Description = storeModel.Description;
-
-                _store.Update(storeId, store);
-
-                StoreDto dto = _store.Map<StoreDto>(store);
+                StoreDto dto = _service.UpdateStore(key, storeId, storeModel);
 
                 return Ok(dto);
             }
@@ -236,8 +159,8 @@ namespace CommerceClone.Controllers
         }
 
         // DELETE: v1/stores/{store_id}
+        // Takes Secret Key
         [HttpDelete("{storeId}")]
-        [AllowAnonymous]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
         public ActionResult DeleteStore(int storeId)
@@ -245,23 +168,13 @@ namespace CommerceClone.Controllers
             try
             {
                 string key = Request.Headers["X-Authorization"];
-                string email = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-                Store store = _store.GetByQuery(e => e.Id == storeId, includes);
+                bool deleted = _service.DeleteStore(key, storeId);
 
-                if (store == null)
-                    return NotFound();
-
-                // If key is defined, check auth
-                if (!string.IsNullOrEmpty(key) && store.Admin.SecretKey != key)
-                    return Unauthorized();
-                // If email is defined, check auth
-                if (!string.IsNullOrEmpty(email) && store.Admin.Email != email)
-                    return Unauthorized();
-
-                _store.Delete(storeId);
-
-                return Ok();
+                if (deleted)
+                    return Ok();
+                else
+                    return BadRequest("Failed to delete store");
             }
             catch (Exception ex)
             {
