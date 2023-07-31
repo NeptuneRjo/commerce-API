@@ -12,11 +12,12 @@ namespace CommerceClone.Interfaces
         /// <param name="store"></param>
         /// <returns>The store object after creation</returns>
         Store AddByKey(string sk, Store store);
-        Store AddByEmail(string email, Store store);
-        Store AddByAdmin(Admin admin, Store store);
-        ICollection<Store> GetAllByAdminId(int id);
-        ICollection<Store> GetAllByPk(string pk);
-        ICollection<Store> GetAllByEmail(string email);
+        /// <summary>
+        /// Queries the for the store that matches the id and adds the item
+        /// </summary>
+        /// <param name="item"></param>
+        /// <param name="storeId"></param>
+        /// <returns>The update <see cref="Store"/> object</returns>
         Store AddItem(Item item, int storeId);
     }
 }
