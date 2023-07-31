@@ -9,9 +9,6 @@ using CommerceClone.DTO;
 
 namespace CommerceClone.Controllers
 {
-    using BCrypt.Net;
-    using System.Linq.Expressions;
-
     public class UpdatePasswordBody
     {
         public string Password { get; set; }
@@ -23,11 +20,11 @@ namespace CommerceClone.Controllers
     [Route("v1/admin")]
     public class AdminController : ControllerBase
     {
-        private readonly IAdminRepository _admin;
+        private readonly IAdminService _service;
 
-        public AdminController(IAdminRepository adminRepo)
+        public AdminController(IAdminService service)
         {
-            _admin = adminRepo;
+            _service = service;
         }
 
         // POST: v1/admin
@@ -37,22 +34,9 @@ namespace CommerceClone.Controllers
             if (!ModelState.IsValid)
                 return BadRequest();
 
-            if (_admin.GetByEmail(adminModel.Email) != null)
-                return BadRequest("An admin with this email already exists");
-
             try
             {
-                Admin admin = _admin.Map<Admin>(adminModel);
-
-                admin = _admin.GenerateKeys(admin);
-                admin.Password = _admin.EncryptPass(admin.Password);
-
-                if (admin.Stores == null)
-                    admin.Stores = new List<Store>();
-                
-                _admin.Add(admin);
-
-                AdminDto dto = _admin.Map<AdminDto>(admin);
+                AdminDto dto = _service.CreateAdmin(adminModel);
 
                 return Ok(dto);
             }
@@ -71,12 +55,7 @@ namespace CommerceClone.Controllers
             {
                 string email = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-                Admin admin = _admin.GetByQuery(e => e.Email == email, e => e.Stores);
-
-                if (admin == null)
-                    return NotFound("No admin with these credentials found");
-
-                AdminDto dto = _admin.Map<AdminDto>(admin);
+                AdminDto dto = _service.GetAdmin(email);
 
                 return Ok(dto);
             }
@@ -98,23 +77,9 @@ namespace CommerceClone.Controllers
             {
                 string email = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-                Admin admin = _admin.GetByQuery(e => e.Email == email, e => e.Stores);
+                AdminDto dto = _service.UpdateAdmin(email, body.Password, body.UpdatePassword);
 
-                if (admin == null)
-                    return NotFound();
-
-                if (BCrypt.Verify(body.Password, admin.Password)) 
-                {
-                    admin.Password = _admin.EncryptPass(body.UpdatePassword);
-
-                    _admin.Update(admin.Id, admin);
-
-                    AdminDto dto = _admin.Map<AdminDto>(admin);
-
-                    return Ok(dto);
-                }
-
-                return BadRequest("Credentials do not match");
+                return Ok(dto);
             }
             catch (Exception ex)
             {
@@ -131,12 +96,10 @@ namespace CommerceClone.Controllers
             {
                 string email = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-                Admin admin = _admin.GetByQuery(e => e.Email == email, e => e.Stores);
+                bool deleted = _service.DeleteAdmin(email);
 
-                if (admin == null)
-                    return NotFound("No admin with these credentials found");
-
-                _admin.Delete(admin.Id);
+                if (!deleted)
+                    return BadRequest("Failed to delete admin");
 
                 return Ok();
             }
