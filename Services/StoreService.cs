@@ -176,5 +176,22 @@ namespace CommerceClone.Services
                 return false;
             }
         }
+
+        public CartDto CreateCart(string key, int storeId)
+        {
+            Store store = _repository.GetByQuery(e => e.Id == storeId, includes);
+
+            if (store == null)
+                throw new Exception($"No store found with the id: {storeId}");
+
+            if (!PublicAuth(key, store))
+                throw new UnauthorizedAccessException("Key is invalid");
+
+            Cart cart = _repository.AddCart(store);
+
+            CartDto dto = _mapper.Map<CartDto>(cart);
+
+            return dto;
+        }
     }
 }

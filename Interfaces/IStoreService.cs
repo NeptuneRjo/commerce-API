@@ -62,5 +62,12 @@ namespace CommerceClone.Interfaces
         /// <param name="id"></param>
         /// <returns>true if successfully deleted</returns>
         bool DeleteStore(string secretKey, int id);
+        /// <summary>
+        /// Queries the database for the cart that matches the id and creates a new cart
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="id"></param>
+        /// <returns>The created <see cref="CartDto"/> object</returns>
+        CartDto CreateCart(string key, int id);
     }
 }
