@@ -67,6 +67,27 @@ namespace CommerceClone.Controllers
             }
         }
 
+        // POST: v1/stores/{store_id}/cart
+        // Takes Public or Secret Key
+        [HttpPost("{storeId}/cart")]
+        [ProducesResponseType(200, Type = typeof(CartDto))]
+        [ProducesResponseType(400)]
+        public ActionResult CreateCart(int storeId)
+        {
+            try
+            {
+                string key = Request.Headers["X-Authorization"];
+
+                CartDto dto = _service.CreateCart(key, storeId);
+
+                return Ok(dto);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
         // GET: v1/stores
         // Takes Public or Secret Key
         [HttpGet]
