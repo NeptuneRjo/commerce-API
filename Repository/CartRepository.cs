@@ -22,9 +22,12 @@ namespace CommerceClone.Repository
             //cartItem.Cart = cart;
             Item item = _context.Items.Find(cartItem.ItemId);
 
+            if (item == null)
+                throw new Exception($"No item with the id: {cartItem.ItemId} found");
 
             cartItem.CartId = cart.Id;
-            cartItem.Total = item.Price * cartItem.Quantity;
+            cartItem.Price = item.Price;
+            cartItem.Total = cartItem.Price * cartItem.Quantity;
 
             _context.CartItems.Add(cartItem);
 
@@ -37,55 +40,36 @@ namespace CommerceClone.Repository
 
         public Cart ClearItems(Cart cart)
         {
-            cart.CartItems.Clear();
-
-            _context.Carts.Update(cart);
-            _context.SaveChanges();
-
-            return cart;
-        }
-
-        public ICollection<CartItem> RemoveItem(ICollection<CartItem> items, int itemId, int quantity)
-        {
-            var item = items.First(e => e.ItemId == itemId);
-
-            item.Quantity = item.Quantity - quantity;
-
-            if (item.Quantity < 1)
+            foreach (var item in cart.CartItems)
+            {
                 _context.CartItems.Remove(item);
-
-            _context.CartItems.Update(item);
-            _context.SaveChanges();
-
-            return items;
-        }
-
-        public Cart CreateByKey(string pk, int storeId)
-        {
-            Admin admin = _context.Admins.FirstOrDefault(e => e.PublicKey == pk);
-            Store store = _context.Stores.FirstOrDefault(e => e.Id == storeId);
-
-            Cart cart = new Cart();
-            cart.Store = store;
-
-            _context.Carts.Add(cart);
-
-            store.Carts.Add(cart);
+            }
 
             _context.SaveChanges();
 
             return cart;
         }
-        
+
+        public Cart RemoveItem(int cartId, int itemId)
+        {
+            Cart cart = _context.Carts.Find(cartId);
+
+            if (cart == null)
+                throw new Exception($"No cart with the id {cartId} found");
+
+            CartItem cartItem = _context.CartItems.First(e => e.ItemId == itemId);
+            
+            if (cartItem == null)
+                throw new Exception($"No cart item with the item id {itemId} found");
+
+            _context.CartItems.Remove(cartItem);
+            _context.SaveChanges();
+
+            return cart;
+        }
+       
         public Cart UpdateInfo(Cart cart)
         {
-            //foreach (var item in cart.CartItems)
-            //{
-            //    cart.TotalItems += item.Quantity;
-                
-            //    if (item.Total != null)
-            //        cart.Subtotal = cart.Subtotal + (int)item.Total;
-            //}
 
             cart.TotalItems = cart.CartItems.Sum(e => e.Quantity);
             cart.Subtotal = cart.CartItems.Sum(e => e.Total);
@@ -93,6 +77,32 @@ namespace CommerceClone.Repository
             cart.TotalUniqueItems = cart.CartItems.Count();
 
             _context.Carts.Update(cart);
+            _context.SaveChanges();
+
+            return cart;
+        }
+
+        public Cart UpdateItem(int cartId, int itemId, int quantity)
+        {
+            Cart cart = _context.Carts.Find(cartId);
+
+            if (cart == null)
+                throw new Exception($"No cart with the id {cartId} found");
+
+            CartItem cartItem = _context.CartItems.First(e => e.ItemId == itemId);
+            Item item = _context.Items.First(e => e.Id == itemId);
+
+            if (cartItem == null)
+                throw new Exception($"No item with the id {itemId} found in the cart");
+
+            if (quantity == 0)
+                _context.CartItems.Remove(cartItem);
+
+            cartItem.Quantity = quantity;
+            cartItem.Price = item.Price;
+            cartItem.Total = quantity * cartItem.Price;
+            
+            _context.CartItems.Update(cartItem);
             _context.SaveChanges();
 
             return cart;

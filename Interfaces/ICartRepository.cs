@@ -6,8 +6,8 @@ namespace CommerceClone.Interfaces
     {
         Cart AddItem(Cart cart, CartItem cartItem);
         Cart ClearItems(Cart cart);
-        Cart CreateByKey(string pk, int storeId);
-        ICollection<CartItem> RemoveItem(ICollection<CartItem> items, int itemId, int quantity);
+        Cart RemoveItem(int cartId, int itemId);
         Cart UpdateInfo(Cart cart);
+        Cart UpdateItem(int cartId, int itemId, int quantity);
     }
 }
