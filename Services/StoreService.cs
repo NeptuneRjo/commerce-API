@@ -187,7 +187,7 @@ namespace CommerceClone.Services
             if (!PublicAuth(key, store))
                 throw new UnauthorizedAccessException("Key is invalid");
 
-            Cart cart = _repository.AddCart(store);
+            Cart cart = _repository.AddCart(store.Id);
 
             CartDto dto = _mapper.Map<CartDto>(cart);
 
