@@ -19,5 +19,11 @@ namespace CommerceClone.Interfaces
         /// <param name="storeId"></param>
         /// <returns>The update <see cref="Store"/> object</returns>
         Store AddItem(Item item, int storeId);
+        /// <summary>
+        /// Creates a new cart and adds it to the store
+        /// </summary>
+        /// <param name="store"></param>
+        /// <returns>The newly created <see cref="Cart"/> object</returns>
+        Cart AddCart(int storeId);
     }
 }

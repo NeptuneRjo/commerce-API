@@ -45,5 +45,21 @@ namespace CommerceClone.Repository
 
             return store;
         }
+
+        public Cart AddCart(int id)
+        {
+            Store store = _context.Stores.First(e => e.Id == id);
+
+            Cart cart = new Cart();
+            cart.Store = store;
+
+            _context.Carts.Add(cart);
+
+            store.Carts.Add(cart);
+
+            _context.SaveChanges();
+
+            return cart;
+        }
     }
 }
