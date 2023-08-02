@@ -1,4 +1,5 @@
-﻿using System.Linq.Expressions;
+﻿using CommerceClone.Models;
+using System.Linq.Expressions;
 
 namespace CommerceClone.Interfaces
 {
@@ -28,5 +29,19 @@ namespace CommerceClone.Interfaces
         /// <param name="entity"></param>
         /// <returns>The mapped entity</returns>
         T Map<T>(dynamic entity);
+        /// <summary>
+        /// Checks if the provided public or secret key matches the admin
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="admin"></param>
+        /// <returns>true if there is a match</returns>
+        bool PublicAuth(string key, Admin admin);
+        /// <summary>
+        /// Checks if the provided secret key matches the admin;
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="admin"></param>
+        /// <returns></returns>
+        bool PrivateAuth(string key, Admin admin);
     }
 }

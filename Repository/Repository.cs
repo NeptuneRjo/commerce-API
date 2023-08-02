@@ -101,5 +101,25 @@ namespace CommerceClone.Repository
         {
             return _mapper.Map<T>(entity);
         }
+
+        public bool PublicAuth(string key, Admin admin)
+        {
+            string keyid = key.Substring(0, 3);
+
+            switch (keyid)
+            {
+                case "PK_":
+                    return admin.PublicKey == key;
+                case "SK_":
+                    return admin.SecretKey == key;
+                default:
+                    return false;
+            }
+        }
+
+        public bool PrivateAuth(string key, Admin admin)
+        {
+            return admin.SecretKey == key;
+        }
     }
 }
