@@ -3,21 +3,16 @@ using CommerceClone.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
-using System.Text.Json.Serialization;
 using CommerceClone.DTO;
-
+using CommerceClone.CustomExceptions;
 
 namespace CommerceClone.Controllers
 {
-    public class UpdatePasswordBody
-    {
-        public string Password { get; set; }
-        [JsonPropertyName("update_password")]
-        public string UpdatePassword { get; set; }
-    }
-
     [ApiController]
     [Route("v1/admin")]
+    [ProducesResponseType(400)]
+    [ProducesResponseType(404)]
+    [ProducesResponseType(500)]
     public class AdminController : ControllerBase
     {
         private readonly IAdminService _service;
@@ -29,6 +24,7 @@ namespace CommerceClone.Controllers
 
         // POST: v1/admin
         [HttpPost]
+        [ProducesResponseType(200, Type = typeof(AdminDto))]
         public ActionResult CreateAdmin(AdminModel adminModel)
         {
             if (!ModelState.IsValid)
@@ -40,15 +36,20 @@ namespace CommerceClone.Controllers
 
                 return Ok(dto);
             }
-            catch (Exception ex)
+            catch (ObjectExistsException ex)
             {
                 return BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
             }
         }
 
         // GET: v1/admin
         [Authorize]
         [HttpGet]
+        [ProducesResponseType(200, Type = typeof(AdminDto))]
         public ActionResult GetAdmin()
         {
             try
@@ -59,16 +60,21 @@ namespace CommerceClone.Controllers
 
                 return Ok(dto);
             }
-            catch (Exception ex)
+            catch (ObjectNotFoundException ex)
             {
-                return BadRequest(ex.Message);
+                return NotFound(ex.Message);
+            }
+            catch(Exception ex)
+            {
+                return StatusCode(500, ex.Message);
             }
         }
 
         // PUT: v1/admin
         [Authorize]
         [HttpPut]
-        public ActionResult UpdatePassword([FromBody] UpdatePasswordBody body) 
+        [ProducesResponseType(200, Type = typeof(AdminDto))]
+        public ActionResult UpdatePassword([FromBody] UpdateAdmin body) 
         { 
             if (!ModelState.IsValid)
                 return BadRequest();
@@ -81,15 +87,24 @@ namespace CommerceClone.Controllers
 
                 return Ok(dto);
             }
+            catch (ObjectNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Unauthorized(ex.Message);
+            }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return StatusCode(500, ex.Message);
             }
         }
 
         // DELETE: v1/admin
         [Authorize]
         [HttpDelete]
+        [ProducesResponseType(200)]
         public ActionResult DeleteAdmin()
         {
             try
@@ -99,13 +114,21 @@ namespace CommerceClone.Controllers
                 bool deleted = _service.DeleteAdmin(email);
 
                 if (!deleted)
-                    return BadRequest("Failed to delete admin");
+                    return StatusCode(500, "Failed to delete admin");
 
                 return Ok();
             }
+            catch (ObjectNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Unauthorized(ex.Message);
+            }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return StatusCode(500, ex.Message);
             }
         }
     }
