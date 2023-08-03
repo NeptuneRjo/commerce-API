@@ -7,6 +7,7 @@ using System.Linq.Expressions;
 namespace CommerceClone.Services
 {
     using BCrypt.Net;
+    using CommerceClone.CustomExceptions;
 
     public class AdminService : IAdminService
     {
@@ -26,7 +27,7 @@ namespace CommerceClone.Services
             Admin exists = _repository.GetByQuery(e => e.Email == adminModel.Email);
 
             if (exists != null)
-                throw new Exception($"An admin with the email {adminModel.Email} already exists");
+                throw new ObjectExistsException($"An admin with the email {adminModel.Email} already exists");
 
             Admin admin = _mapper.Map<Admin>(adminModel);
 
@@ -48,7 +49,7 @@ namespace CommerceClone.Services
             Admin admin = _repository.GetByQuery(e => e.Email == email);
 
             if (admin == null)
-                throw new Exception($"No admin with the email: {email} found");
+                throw new ObjectNotFoundException($"No admin with the email: {email} found");
 
             try
             {
@@ -66,7 +67,7 @@ namespace CommerceClone.Services
             Admin admin = _repository.GetByQuery(e => e.Email == email, includes);
 
             if (admin == null)
-                throw new Exception($"No admin with the email: {email} found");
+                throw new ObjectNotFoundException($"No admin with the email: {email} found");
 
             AdminDto dto = _mapper.Map<AdminDto>(admin);
 
@@ -78,7 +79,7 @@ namespace CommerceClone.Services
             Admin admin = _repository.GetByQuery(e => e.Email == email);
 
             if (admin == null)
-                throw new Exception($"No admin with the email: {email} found");
+                throw new ObjectNotFoundException($"No admin with the email: {email} found");
 
             bool verified = BCrypt.Verify(oldPass, admin.Password);
 
@@ -93,7 +94,7 @@ namespace CommerceClone.Services
                 return dto;
             }
 
-            throw new Exception("Credentials do not match");
+            throw new UnauthorizedAccessException("Credentials do not match");
         }
     }
 }
