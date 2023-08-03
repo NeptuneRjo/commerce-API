@@ -1,4 +1,5 @@
-﻿using CommerceClone.DTO;
+﻿using CommerceClone.CustomExceptions;
+using CommerceClone.DTO;
 using CommerceClone.Interfaces;
 using CommerceClone.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -9,7 +10,9 @@ namespace CommerceClone.Controllers
 
     [ApiController]
     [Route("v1/stores")]
-    [Authorize]
+    [ProducesResponseType(400)]
+    [ProducesResponseType(404)]
+    [ProducesResponseType(500)]
     public class StoreController : ControllerBase
     {
         private readonly IStoreService _service;
@@ -39,7 +42,7 @@ namespace CommerceClone.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return StatusCode(500, ex.Message);
             }
         }
 
@@ -47,7 +50,6 @@ namespace CommerceClone.Controllers
         // Takes Secret Key
         [HttpPost("{storeId}/items")]
         [ProducesResponseType(200, Type = typeof(ItemDto))]
-        [ProducesResponseType(400)]
         public ActionResult CreateItem(int storeId, ItemModel itemModel)
         {
             if (!ModelState.IsValid)
@@ -61,9 +63,17 @@ namespace CommerceClone.Controllers
 
                 return Ok(dto);
             }
+            catch (ObjectNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Unauthorized(ex.Message);
+            }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return StatusCode(500, ex.Message);
             }
         }
 
@@ -71,7 +81,6 @@ namespace CommerceClone.Controllers
         // Takes Public or Secret Key
         [HttpPost("{storeId}/cart")]
         [ProducesResponseType(200, Type = typeof(CartDto))]
-        [ProducesResponseType(400)]
         public ActionResult CreateCart(int storeId)
         {
             try
@@ -82,9 +91,17 @@ namespace CommerceClone.Controllers
 
                 return Ok(dto);
             }
+            catch (ObjectNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Unauthorized(ex.Message);
+            }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return StatusCode(500, ex.Message);
             }
         }
 
@@ -92,7 +109,6 @@ namespace CommerceClone.Controllers
         // Takes Public or Secret Key
         [HttpGet]
         [ProducesResponseType(200, Type = typeof(ICollection<StoreDto>))]
-        [ProducesResponseType(400)]
         public ActionResult GetStores()
         {
             try
@@ -103,17 +119,20 @@ namespace CommerceClone.Controllers
 
                 return Ok(dtos);
             }
-            catch (Exception ex)
+            catch (ArgumentException ex)
             {
                 return BadRequest(ex.Message);
             }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            } 
         }
 
         // GET: v1/stores/{store_id}
         // Takes Public or Secret Key
         [HttpGet("{storeId}")]
         [ProducesResponseType(200, Type = typeof(StoreDto))]
-        [ProducesResponseType(400)]
         public ActionResult GetStoreById(int storeId)
         {
             try
@@ -124,13 +143,17 @@ namespace CommerceClone.Controllers
 
                 return Ok(dto);
             }
+            catch (ObjectNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
             catch (UnauthorizedAccessException ex)
             {
                 return Unauthorized(ex.Message);
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return StatusCode(500, ex.Message);
             }
         }
 
@@ -138,7 +161,6 @@ namespace CommerceClone.Controllers
         // Takes Public or Secret Key
         [HttpGet("{storeId}/items")]
         [ProducesResponseType(200, Type = typeof(ICollection<ItemDto>))]
-        [ProducesResponseType(400)]
         public ActionResult GetStoreItems(int storeId)
         {
             try
@@ -149,9 +171,17 @@ namespace CommerceClone.Controllers
 
                 return Ok(dtos);
             }
+            catch (ObjectNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Unauthorized(ex.Message);
+            }
             catch (Exception ex)
             {
-                return BadRequest(ex);
+                return StatusCode(500, ex.Message);
             }
         }
 
@@ -159,7 +189,6 @@ namespace CommerceClone.Controllers
         // Takes Secret Key
         [HttpPut("{storeId}")]
         [ProducesResponseType(200, Type = typeof(StoreDto))]
-        [ProducesResponseType(400)]
         public ActionResult UpdateStore(int storeId, StoreModel storeModel)
         {
             if (!ModelState.IsValid)
@@ -173,9 +202,17 @@ namespace CommerceClone.Controllers
 
                 return Ok(dto);
             }
+            catch (ObjectNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Unauthorized(ex.Message);
+            }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return StatusCode(500, ex.Message);
             }
         }
 
@@ -183,7 +220,6 @@ namespace CommerceClone.Controllers
         // Takes Secret Key
         [HttpDelete("{storeId}")]
         [ProducesResponseType(200)]
-        [ProducesResponseType(400)]
         public ActionResult DeleteStore(int storeId)
         {
             try
@@ -197,9 +233,17 @@ namespace CommerceClone.Controllers
                 else
                     return BadRequest("Failed to delete store");
             }
+            catch (ObjectNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Unauthorized(ex.Message);
+            }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return StatusCode(500, ex.Message);
             }
         }
     }
