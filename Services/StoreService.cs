@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using CommerceClone.CustomExceptions;
 using CommerceClone.DTO;
 using CommerceClone.Interfaces;
 using CommerceClone.Models;
@@ -20,42 +21,6 @@ namespace CommerceClone.Services
             _mapper = mapper;
         }
 
-        /// <summary>
-        /// Determines if the key has authorization to access the provided store
-        /// <br/>
-        /// Checks both Public and Secret key
-        /// </summary>
-        /// <param name="key"></param>
-        /// <param name="store"></param>
-        /// <returns></returns>
-        private bool PublicAuth(string key, Store store)
-        {
-            string keyid = key.Substring(0, 3);
-
-            switch (keyid)
-            {
-                case "PK_":
-                    return store.Admin.PublicKey == key;
-                case "SK_":
-                    return store.Admin.SecretKey == key;
-                default:
-                    return false;
-            }
-        }
-
-        /// <summary>
-        /// Determines if the key has authorization to access the provided store
-        /// <br />
-        /// Checks the Secret key
-        /// </summary>
-        /// <param name="key"></param>
-        /// <param name="store"></param>
-        /// <returns></returns>
-        private bool PrivateAuth(string key, Store store)
-        {
-            return store.Admin.SecretKey == key;
-        }
-
         public ICollection<StoreDto> GetStores(string key)
         {
             Expression<Func<Store, bool>> query;
@@ -75,11 +40,14 @@ namespace CommerceClone.Services
             return dtos;
         }
 
-        public StoreDto GetStoreById(string key, int id)
+        public StoreDto GetStoreById(string key, int storeId)
         {
-            Store store = _repository.GetByQuery(e => e.Id == id, includes);
+            Store store = _repository.GetByQuery(e => e.Id == storeId, includes);
 
-            if (!PublicAuth(key, store))
+            if (store == null)
+                throw new ObjectNotFoundException($"No store found with the id: {storeId}");
+
+            if (!_repository.PublicAuth(key, store.Admin))
                 throw new UnauthorizedAccessException("Key is invalid");
 
             StoreDto dto = _mapper.Map<StoreDto>(store);
@@ -92,9 +60,9 @@ namespace CommerceClone.Services
             Store store = _repository.GetByQuery(e => e.Id == storeId, includes);
 
             if (store == null)
-                throw new Exception($"No store found with the id: {storeId}");
+                throw new ObjectNotFoundException($"No store found with the id: {storeId}");
 
-            if (!PrivateAuth(key, store))
+            if (!_repository.PrivateAuth(key, store.Admin))
                 throw new UnauthorizedAccessException("Key is invalid");
 
             Item item = _repository.Map<Item>(itemModel);
@@ -122,9 +90,9 @@ namespace CommerceClone.Services
             Store store = _repository.GetByQuery(e => e.Id == storeId, includes);
 
             if (store == null)
-                throw new Exception($"No store found with the id: {storeId}");
+                throw new ObjectNotFoundException($"No store found with the id: {storeId}");
 
-            if (!PublicAuth(key, store))
+            if (!_repository.PublicAuth(key, store.Admin))
                 throw new UnauthorizedAccessException("Key is invalid");
 
             ICollection<Item> items = store.Items.ToList();
@@ -138,9 +106,9 @@ namespace CommerceClone.Services
             Store store = _repository.GetByQuery(e => e.Id == storeId, includes);
 
             if (store == null)
-                throw new Exception($"No store found with the id: {storeId}");
+                throw new ObjectNotFoundException($"No store found with the id: {storeId}");
 
-            if (!PrivateAuth(key, store))
+            if (!_repository.PrivateAuth(key, store.Admin))
                 throw new UnauthorizedAccessException("Key is invalid");
 
             if (storeModel.Name != null)
@@ -161,9 +129,9 @@ namespace CommerceClone.Services
             Store store = _repository.GetByQuery(e => e.Id == storeId, includes);
 
             if (store == null)
-                throw new Exception($"No store found with the id: {storeId}");
+                throw new ObjectNotFoundException($"No store found with the id: {storeId}");
 
-            if (!PrivateAuth(key, store))
+            if (!_repository.PrivateAuth(key, store.Admin))
                 throw new UnauthorizedAccessException("Key is invalid");
 
             try
@@ -182,9 +150,9 @@ namespace CommerceClone.Services
             Store store = _repository.GetByQuery(e => e.Id == storeId, includes);
 
             if (store == null)
-                throw new Exception($"No store found with the id: {storeId}");
+                throw new ObjectNotFoundException($"No store found with the id: {storeId}");
 
-            if (!PublicAuth(key, store))
+            if (!_repository.PublicAuth(key, store.Admin))
                 throw new UnauthorizedAccessException("Key is invalid");
 
             Cart cart = _repository.AddCart(store.Id);
