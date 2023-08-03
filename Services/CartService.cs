@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using CommerceClone.CustomExceptions;
 using CommerceClone.DTO;
 using CommerceClone.Interfaces;
 using CommerceClone.Models;
@@ -28,7 +29,7 @@ namespace CommerceClone.Services
             Cart cart = _repository.GetByQuery(e => e.Id == id, includes);
 
             if (cart == null)
-                throw new Exception($"No cart found with the id: {id}");
+                throw new ObjectNotFoundException($"No cart found with the id: {id}");
 
             if (!_repository.PublicAuth(key, cart.Store.Admin))
                 throw new UnauthorizedAccessException("Key is invalid");
@@ -48,7 +49,7 @@ namespace CommerceClone.Services
             Cart cart = _repository.GetByQuery(e => e.Id == id, includes);
 
             if (cart == null)
-                throw new Exception($"No cart found with the id: {id}");
+                throw new ObjectNotFoundException($"No cart found with the id: {id}");
 
             if (!_repository.PublicAuth(key, cart.Store.Admin))
                 throw new UnauthorizedAccessException("Key is invalid");
@@ -70,7 +71,7 @@ namespace CommerceClone.Services
             Cart cart = _repository.GetByQuery(e => e.Id == id, includes);
 
             if (cart == null)
-                throw new Exception($"No cart found with the id: {id}");
+                throw new ObjectNotFoundException($"No cart found with the id: {id}");
 
             if (!_repository.PublicAuth(key, cart.Store.Admin))
                 throw new UnauthorizedAccessException("Key is invalid");
@@ -88,7 +89,7 @@ namespace CommerceClone.Services
             Cart cart = _repository.GetByQuery(e => e.Id == id, includes);
 
             if (cart == null)
-                throw new Exception($"No cart found with the id: {id}");
+                throw new ObjectNotFoundException($"No cart found with the id: {id}");
 
             if (!_repository.PublicAuth(key, cart.Store.Admin))
                 throw new UnauthorizedAccessException("Key is invalid");
@@ -106,7 +107,7 @@ namespace CommerceClone.Services
             Cart cart = _repository.GetByQuery(e => e.Id == id, includes);
 
             if (cart == null)
-                throw new Exception($"No cart found with the id: {id}");
+                throw new ObjectNotFoundException($"No cart found with the id: {id}");
 
             if (!_repository.PublicAuth(key, cart.Store.Admin))
                 throw new UnauthorizedAccessException("Key is invalid");
