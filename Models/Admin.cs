@@ -24,4 +24,11 @@ namespace CommerceClone.Models
         public string Email { get; set; }
         public string Password { get; set; }
     }
+
+    public class UpdateAdmin
+    {
+        public string Password { get; set; }
+        [JsonPropertyName("update_password")]
+        public string UpdatePassword { get; set; }
+    }
 }
