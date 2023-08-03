@@ -1,6 +1,7 @@
 using CommerceClone.Data;
 using CommerceClone.Interfaces;
 using CommerceClone.Repository;
+using CommerceClone.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,12 +11,21 @@ IServiceCollection services = builder.Services;
 // Add services to the container.
 services.AddControllersWithViews();
 
-services.AddScoped<ICartRepository, CartRepository>();
+// Repositories
+services.AddScoped<IAuthenticationRepository, AuthenticationRepository>();
+services.AddScoped<IAdminRepository, AdminRepository>();
 services.AddScoped<IItemRepository, ItemRepository>();
 services.AddScoped<IStoreRepository, StoreRepository>();
-services.AddScoped<IUserRepository, UserRepository>();
+services.AddScoped<ICartRepository, CartRepository>();
+
+// Data
 services.AddScoped<IDataContext, DataContext>();
-services.AddScoped<IAuthenticationRepository, AuthenticationRepository>();
+
+// Services
+services.AddScoped<IStoreService, StoreService>();
+services.AddScoped<IAdminService, AdminService>();
+services.AddScoped<ICartService, CartService>();
+services.AddScoped<IItemService, ItemService>();
 
 services.AddDbContext<DataContext>(options =>
 {
@@ -28,19 +38,16 @@ services.AddAuthentication(opt =>
 })
     .AddCookie(opt =>
     {
-        opt.LoginPath = "/signin";
-        opt.LogoutPath = "/signout";
+        opt.LoginPath = "/v1/auth";
+        opt.LogoutPath = "/v1/signout";
     })
     .AddGitHub(opt =>
     {
         opt.ClientId = builder.Configuration["GitHub:ClientId"];
         opt.ClientSecret = builder.Configuration["GitHub:ClientSecret"];
     });
-    //.AddGoogle(opt =>
-    //{
-    //    opt.ClientId = builder.Configuration["Google:ClientId"];
-    //    opt.ClientSecret = builder.Configuration["Google:ClientSecret"];
-    //});
+
+services.AddAutoMapper(typeof(Program));
 
 var app = builder.Build();
 
@@ -60,8 +67,6 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+app.MapControllers();
 
 app.Run();
