@@ -3,7 +3,6 @@ using CommerceClone.CustomExceptions;
 using CommerceClone.DTO;
 using CommerceClone.Interfaces;
 using CommerceClone.Models;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System.Linq.Expressions;
 
 namespace CommerceClone.Services
@@ -65,7 +64,7 @@ namespace CommerceClone.Services
             if (!_repository.PrivateAuth(key, store.Admin))
                 throw new UnauthorizedAccessException("Key is invalid");
 
-            Item item = _repository.Map<Item>(itemModel);
+            Item item = _mapper.Map<Item>(itemModel);
 
             _repository.AddItem(item, store.Id);
 
@@ -76,7 +75,7 @@ namespace CommerceClone.Services
 
         public StoreDto CreateNewStore(string key, StoreModel storeModel)
         {
-            Store store = _repository.Map<Store>(storeModel);
+            Store store = _mapper.Map<Store>(storeModel);
             
             store = _repository.AddByKey(key, store);
 
