@@ -13,12 +13,10 @@ namespace CommerceClone.Repository
     public class Repository<TEntity> : IRepository<TEntity> where TEntity : class
     {
         private readonly IDataContext _context;
-        private readonly IMapper _mapper;
 
-        public Repository(IDataContext context, IMapper mapper)
+        public Repository(IDataContext context)
         {
             _context = context;
-            _mapper = mapper;
         }
 
         public TEntity Add(TEntity entity)
@@ -95,11 +93,6 @@ namespace CommerceClone.Repository
         public void SaveChanges()
         {
             _context.SaveChanges();
-        }
-
-        public T Map<T>(dynamic entity)
-        {
-            return _mapper.Map<T>(entity);
         }
 
         public bool PublicAuth(string key, Admin admin)

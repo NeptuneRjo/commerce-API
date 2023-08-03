@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using CommerceClone.DTO;
+﻿using CommerceClone.CustomExceptions;
 using CommerceClone.Interfaces;
 using CommerceClone.Models;
 
@@ -9,21 +8,18 @@ namespace CommerceClone.Repository
     {
 
         private readonly IDataContext _context;
-        private readonly IMapper _mapper;
 
-        public CartRepository(IDataContext context, IMapper mapper) : base(context, mapper)
+        public CartRepository(IDataContext context) : base(context)
         {
             _context = context;
-            _mapper = mapper;
         }
 
         public Cart AddItem(Cart cart, CartItem cartItem)
         {
-            //cartItem.Cart = cart;
             Item item = _context.Items.Find(cartItem.ItemId);
 
             if (item == null)
-                throw new Exception($"No item with the id: {cartItem.ItemId} found");
+                throw new ObjectNotFoundException($"No item with the id: {cartItem.ItemId} found");
 
             cartItem.CartId = cart.Id;
             cartItem.Price = item.Price;
@@ -55,12 +51,12 @@ namespace CommerceClone.Repository
             Cart cart = _context.Carts.Find(cartId);
 
             if (cart == null)
-                throw new Exception($"No cart with the id {cartId} found");
+                throw new ObjectNotFoundException($"No cart with the id {cartId} found");
 
             CartItem cartItem = _context.CartItems.First(e => e.ItemId == itemId);
             
             if (cartItem == null)
-                throw new Exception($"No cart item with the item id {itemId} found");
+                throw new ObjectNotFoundException($"No cart item with the item id {itemId} found");
 
             _context.CartItems.Remove(cartItem);
             _context.SaveChanges();
@@ -87,13 +83,13 @@ namespace CommerceClone.Repository
             Cart cart = _context.Carts.Find(cartId);
 
             if (cart == null)
-                throw new Exception($"No cart with the id {cartId} found");
+                throw new ObjectNotFoundException($"No cart with the id {cartId} found");
 
             CartItem cartItem = _context.CartItems.First(e => e.ItemId == itemId);
             Item item = _context.Items.First(e => e.Id == itemId);
 
             if (cartItem == null)
-                throw new Exception($"No item with the id {itemId} found in the cart");
+                throw new ObjectNotFoundException($"No item with the id {itemId} found in the cart");
 
             if (quantity == 0)
                 _context.CartItems.Remove(cartItem);

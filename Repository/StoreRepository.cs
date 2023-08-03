@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using CommerceClone.Interfaces;
+﻿using CommerceClone.Interfaces;
 using CommerceClone.Models;
 
 namespace CommerceClone.Repository
@@ -8,7 +7,7 @@ namespace CommerceClone.Repository
     {
         private readonly IDataContext _context;
 
-        public StoreRepository(IDataContext context, IMapper mapper) : base(context, mapper)
+        public StoreRepository(IDataContext context) : base(context)
         {
             _context = context;
         }

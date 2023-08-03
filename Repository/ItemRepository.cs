@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using CommerceClone.Interfaces;
+﻿using CommerceClone.Interfaces;
 using CommerceClone.Models;
 
 namespace CommerceClone.Repository
@@ -7,12 +6,10 @@ namespace CommerceClone.Repository
     public class ItemRepository : Repository<Item>, IItemRepository
     {
         private readonly IDataContext _context;
-        private readonly IMapper _mapper;
 
-        public ItemRepository(IDataContext context, IMapper mapper) : base(context, mapper) 
+        public ItemRepository(IDataContext context) : base(context) 
         {
             _context = context;
-            _mapper = mapper;
         }
 
         public Item AddByEmail(string email, int storeId, Item item)

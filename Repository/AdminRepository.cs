@@ -1,6 +1,5 @@
 ﻿using CommerceClone.Interfaces;
 using CommerceClone.Models;
-using AutoMapper;
 
 namespace CommerceClone.Repository
 {
@@ -10,7 +9,7 @@ namespace CommerceClone.Repository
     {
         private readonly IDataContext _context;
 
-        public AdminRepository(IDataContext context, IMapper mapper) : base(context, mapper)
+        public AdminRepository(IDataContext context) : base(context)
         {
             _context = context;
         }
