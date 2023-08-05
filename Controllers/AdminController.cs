@@ -23,12 +23,12 @@ namespace CommerceClone.Controllers
         }
 
         // POST: v1/admin
-        [HttpPost]
+        [HttpPost("/create")]
         [ProducesResponseType(200, Type = typeof(AdminDto))]
-        public ActionResult CreateAdmin(AdminModel adminModel)
+        public ActionResult Signup(AdminModel adminModel)
         {
             if (!ModelState.IsValid)
-                return BadRequest();
+                return BadRequest(ModelState);
 
             try
             {
@@ -47,16 +47,16 @@ namespace CommerceClone.Controllers
         }
 
         // GET: v1/admin
-        [Authorize]
-        [HttpGet]
+        [HttpPost]
         [ProducesResponseType(200, Type = typeof(AdminDto))]
-        public ActionResult GetAdmin()
+        public ActionResult Login(AdminModel adminModel)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             try
             {
-                string email = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
-                AdminDto dto = _service.GetAdmin(email);
+                AdminDto dto = _service.GetAdmin(adminModel);
 
                 return Ok(dto);
             }
@@ -71,19 +71,16 @@ namespace CommerceClone.Controllers
         }
 
         // PUT: v1/admin
-        [Authorize]
         [HttpPut]
         [ProducesResponseType(200, Type = typeof(AdminDto))]
-        public ActionResult UpdatePassword([FromBody] UpdateAdmin body) 
+        public ActionResult UpdatePassword(UpdateAdmin body) 
         { 
             if (!ModelState.IsValid)
                 return BadRequest();
 
             try
             {
-                string email = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
-                AdminDto dto = _service.UpdateAdmin(email, body.Password, body.UpdatePassword);
+                AdminDto dto = _service.UpdateAdmin(body);
 
                 return Ok(dto);
             }
@@ -102,16 +99,16 @@ namespace CommerceClone.Controllers
         }
 
         // DELETE: v1/admin
-        [Authorize]
         [HttpDelete]
         [ProducesResponseType(200)]
-        public ActionResult DeleteAdmin()
+        public ActionResult DeleteAdmin(AdminModel adminModel)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             try
             {
-                string email = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
-                bool deleted = _service.DeleteAdmin(email);
+                bool deleted = _service.DeleteAdmin(adminModel);
 
                 if (!deleted)
                     return StatusCode(500, "Failed to delete admin");

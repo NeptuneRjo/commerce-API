@@ -31,10 +31,16 @@ namespace CommerceClone.Repository
 
         public string EncryptPass(string password)
         {
-            var salt = BCrypt.GenerateSalt();
+            string salt = BCrypt.GenerateSalt();
             string hashedPass = BCrypt.HashPassword(password, salt);
 
             return hashedPass;
         }
+
+        public bool ValidatePass(Admin admin, string password)
+        {
+            return BCrypt.Verify(password, admin.Password);
+        }
+
     }
 }
