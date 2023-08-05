@@ -30,16 +30,6 @@ services.AddDbContext<DataContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
-string MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
-
-services.AddCors(options =>
-{
-    options.AddPolicy(name: MyAllowSpecificOrigins, policy =>
-    {
-        policy.WithOrigins("https://localhost:3000");
-    });
-});
-
 services.AddAutoMapper(typeof(Program));
 
 var app = builder.Build();
