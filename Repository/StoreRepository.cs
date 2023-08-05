@@ -14,7 +14,7 @@ namespace CommerceClone.Repository
 
         public Store AddByKey(string sk, Store store)
         {
-            var admin = _context.Admins.FirstOrDefault(e => e.SecretKey == sk);
+            Admin admin = _context.Admins.FirstOrDefault(e => e.SecretKey == sk);
 
             store.Admin = admin;
 
