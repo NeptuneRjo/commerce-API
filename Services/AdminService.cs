@@ -3,12 +3,10 @@ using CommerceClone.DTO;
 using CommerceClone.Interfaces;
 using CommerceClone.Models;
 using System.Linq.Expressions;
+using CommerceClone.CustomExceptions;
 
 namespace CommerceClone.Services
 {
-    using BCrypt.Net;
-    using CommerceClone.CustomExceptions;
-
     public class AdminService : IAdminService
     {
         private readonly IAdminRepository _repository;
@@ -24,10 +22,12 @@ namespace CommerceClone.Services
 
         public AdminDto CreateAdmin(AdminModel adminModel)
         {
-            Admin exists = _repository.GetByQuery(e => e.Email == adminModel.Email);
+            var (email, password) = adminModel;
+
+            Admin exists = _repository.GetByQuery(e => e.Email == email);
 
             if (exists != null)
-                throw new ObjectExistsException($"An admin with the email {adminModel.Email} already exists");
+                throw new ObjectExistsException($"An admin with the email {email} already exists");
 
             Admin admin = _mapper.Map<Admin>(adminModel);
 
@@ -44,12 +44,17 @@ namespace CommerceClone.Services
             return dto;
         }
 
-        public bool DeleteAdmin(string email)
+        public bool DeleteAdmin(AdminModel adminModel)
         {
+            var (email, password) = adminModel;
+
             Admin admin = _repository.GetByQuery(e => e.Email == email);
 
             if (admin == null)
                 throw new ObjectNotFoundException($"No admin with the email: {email} found");
+
+            if (!_repository.ValidatePass(admin, password))
+                throw new UnauthorizedAccessException("Invalid credentials");
 
             try
             {
@@ -62,39 +67,42 @@ namespace CommerceClone.Services
             }
         }
 
-        public AdminDto GetAdmin(string email)
+        public AdminDto GetAdmin(AdminModel adminModel)
         {
+            var (email, password) = adminModel;
+
             Admin admin = _repository.GetByQuery(e => e.Email == email, includes);
 
             if (admin == null)
                 throw new ObjectNotFoundException($"No admin with the email: {email} found");
+
+            if (!_repository.ValidatePass(admin, password))
+                throw new UnauthorizedAccessException("Invalid credentials");
 
             AdminDto dto = _mapper.Map<AdminDto>(admin);
 
             return dto;
         }
 
-        public AdminDto UpdateAdmin(string email, string oldPass, string newPass)
+        public AdminDto UpdateAdmin(UpdateAdmin update)
         {
+            var (email, password, updatePassword) = update;
+
             Admin admin = _repository.GetByQuery(e => e.Email == email);
 
             if (admin == null)
                 throw new ObjectNotFoundException($"No admin with the email: {email} found");
 
-            bool verified = BCrypt.Verify(oldPass, admin.Password);
+            if (!_repository.ValidatePass(admin, password))
+                throw new UnauthorizedAccessException("Invalid credentials");
 
-            if (verified)
-            {
-                admin.Password = _repository.EncryptPass(newPass);
+            admin.Password = _repository.EncryptPass(updatePassword);
 
-                _repository.Update(admin.Id, admin);
+            _repository.Update(admin.Id, admin);
 
-                AdminDto dto = _mapper.Map<AdminDto>(admin);
+            AdminDto dto = _mapper.Map<AdminDto>(admin);
 
-                return dto;
-            }
-
-            throw new UnauthorizedAccessException("Credentials do not match");
+            return dto;
         }
     }
 }
