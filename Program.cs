@@ -2,7 +2,6 @@ using CommerceClone.Data;
 using CommerceClone.Interfaces;
 using CommerceClone.Repository;
 using CommerceClone.Services;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,7 +11,6 @@ IServiceCollection services = builder.Services;
 services.AddControllersWithViews();
 
 // Repositories
-services.AddScoped<IAuthenticationRepository, AuthenticationRepository>();
 services.AddScoped<IAdminRepository, AdminRepository>();
 services.AddScoped<IItemRepository, ItemRepository>();
 services.AddScoped<IStoreRepository, StoreRepository>();
@@ -32,20 +30,15 @@ services.AddDbContext<DataContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
-services.AddAuthentication(opt =>
+string MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+
+services.AddCors(options =>
 {
-    opt.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-})
-    .AddCookie(opt =>
+    options.AddPolicy(name: MyAllowSpecificOrigins, policy =>
     {
-        opt.LoginPath = "/v1/auth";
-        opt.LogoutPath = "/v1/signout";
-    })
-    .AddGitHub(opt =>
-    {
-        opt.ClientId = builder.Configuration["GitHub:ClientId"];
-        opt.ClientSecret = builder.Configuration["GitHub:ClientSecret"];
+        policy.WithOrigins("https://localhost:3000");
     });
+});
 
 services.AddAutoMapper(typeof(Program));
 
@@ -64,7 +57,6 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
