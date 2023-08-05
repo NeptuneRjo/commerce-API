@@ -3,9 +3,9 @@ using System.Linq.Expressions;
 
 namespace CommerceClone.Interfaces
 {
-    public interface IRepository < TEntity >
+    public interface IRepository<TEntity>
     {
-        TEntity Add (TEntity entity);
+        TEntity Add(TEntity entity);
         void AddRange(IEnumerable<TEntity> entities);
         ICollection<TEntity> GetAll();
         /// <summary>
