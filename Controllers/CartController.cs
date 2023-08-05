@@ -82,7 +82,7 @@ namespace CommerceClone.Controllers
 
         // DELETE: v1/cart/{cart_id}/items
         // Takes Public or Secret Key
-        [HttpDelete("{cartId}/items")]
+        [HttpGet("{cartId}/empty")]
         public ActionResult EmptyCart(int cartId)
         {
             try
@@ -99,9 +99,9 @@ namespace CommerceClone.Controllers
             }
         }
 
-        // PUT: v1/cart/{cart_id}/items
+        // PUT: v1/cart/{cart_id}
         // Takes Public or Secret Key
-        [HttpPut("{cartId}/items")]
+        [HttpPut("{cartId}")]
         public ActionResult UpdateItemInCart(int cartId, [FromBody] UpdateCartModel body)
         {
             try
