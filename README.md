@@ -15,7 +15,7 @@ I used `ASP.NET`, `SQL`, and `Azure` to build this project.
 
 ## Approach
 
-I utilized the Repository Pattern to build this API due to its modularity and maintainability.
+The Repository Pattern was used to build this API due to its modularity and maintainability.
 
 I intend to add more features in the future, so the ability to easily expand upon the project was important 
 (and building maintainable applications is an important practice regardless...).
