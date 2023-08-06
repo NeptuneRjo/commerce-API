@@ -23,7 +23,7 @@ namespace CommerceClone.Controllers
         }
 
         // POST: v1/admin
-        [HttpPost("/create")]
+        [HttpPost("create")]
         [ProducesResponseType(200, Type = typeof(AdminDto))]
         public ActionResult Signup(AdminModel adminModel)
         {
@@ -46,7 +46,7 @@ namespace CommerceClone.Controllers
             }
         }
 
-        // GET: v1/admin
+        // POST: v1/admin
         [HttpPost]
         [ProducesResponseType(200, Type = typeof(AdminDto))]
         public ActionResult Login(AdminModel adminModel)

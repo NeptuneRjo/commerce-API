@@ -27,7 +27,9 @@ services.AddScoped<IItemService, ItemService>();
 
 services.AddDbContext<DataContext>(options =>
 {
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+    var azureConnectionString = builder.Configuration.GetConnectionString("AZURE_SQL_CONNECTIONSTRING");
+    options.UseSqlServer(azureConnectionString);
+    //options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
 services.AddAutoMapper(typeof(Program));
