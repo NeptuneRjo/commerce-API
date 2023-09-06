@@ -9,11 +9,11 @@ namespace CommerceApi.DAL.Repository
     /// Defines generic repository CRUD behaviors
     /// </summary>
     /// <typeparam name="TEntity"></typeparam>
-    public class Repository<TEntity> : IRepository<TEntity> where TEntity : class
+    public class GenericRepository<TEntity> : IGenericRepository<TEntity> where TEntity : class
     {
         private readonly DataContext _context;
 
-        public Repository(DataContext context)
+        public GenericRepository(DataContext context)
         {
             _context = context;
         }

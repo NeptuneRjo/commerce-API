@@ -1,9 +1,8 @@
-﻿using CommerceApi.DAL.Entities;
-using System.Linq.Expressions;
+﻿using System.Linq.Expressions;
 
 namespace CommerceApi.DAL.Interfaces
 {
-    public interface IRepository<TEntity>
+    public interface IGenericRepository<TEntity>
     {
         TEntity Add(TEntity entity);
         void AddRange(IEnumerable<TEntity> entities);

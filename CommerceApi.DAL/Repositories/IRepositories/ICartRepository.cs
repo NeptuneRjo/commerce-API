@@ -2,7 +2,7 @@
 
 namespace CommerceApi.DAL.Interfaces
 {
-    public interface ICartRepository : IRepository<Cart>
+    public interface ICartRepository : IGenericRepository<Cart>
     {
         Cart AddItem(Cart cart);
         Cart ClearItems(Cart cart);

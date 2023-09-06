@@ -4,7 +4,7 @@ using CommerceApi.DAL.Interfaces;
 
 namespace CommerceApi.DAL.Repository
 {
-    public class ItemRepository : Repository<Product>, IItemRepository
+    public class ItemRepository : GenericRepository<Product>, IItemRepository
     {
         private readonly DataContext _context;
 
