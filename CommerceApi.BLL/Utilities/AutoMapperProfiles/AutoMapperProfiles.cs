@@ -8,8 +8,14 @@ namespace CommerceApi.BLL.Utilities.AutoMapperProfiles
     {
         public AutoMapperProfiles()
         {
-            CreateMap<Product, ItemDto>();
-            CreateMap<Cart, CartDto>();
+            CreateMap<Cart,  CartDto>();
+            CreateMap<CartProduct, CartProductDto>();
+            CreateMap<Product, ProductDto>();
+            CreateMap<ProductReview, ProductReviewDto>();
+            CreateMap<Review, ReviewDto>();
+            CreateMap<User, UserDto>();
+            CreateMap<WishList, WishListDto>();
+            CreateMap<WishListProduct, WishListProductDto>();
         }
 
     }
