@@ -34,11 +34,14 @@ namespace CommerceClone.Models
 
         public string Currency { get; set; }
 
-        public List<ProductReview> ProductReviews { get; set; }
-
         public DateTime CreatedAt { get; set; }
 
         public DateTime UpdatedAt { get; set; }
 
+        public ICollection<ProductReview> ProductReviews { get; set; }
+
+        public ICollection<CartProduct> CartProducts { get; set; }
+
+        public ICollection<WishListProduct> WishListProducts { get; set; }
     }
 }
