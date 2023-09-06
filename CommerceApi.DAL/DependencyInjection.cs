@@ -1,6 +1,5 @@
-﻿using CommerceApi.DAL.Data;
-using CommerceApi.DAL.Interfaces;
-using CommerceApi.DAL.Repository;
+﻿using CommerceApi.DAL.Repositories;
+using CommerceApi.DAL.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

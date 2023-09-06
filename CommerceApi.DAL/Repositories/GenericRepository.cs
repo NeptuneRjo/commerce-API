@@ -1,9 +1,8 @@
 ﻿using CommerceApi.DAL.Data;
-using CommerceApi.DAL.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
-namespace CommerceApi.DAL.Repository
+namespace CommerceApi.DAL.Repositories
 {
     /// <summary>
     /// Defines generic repository CRUD behaviors

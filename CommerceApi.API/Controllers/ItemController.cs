@@ -1,4 +1,4 @@
-﻿using CommerceApi.BLL.Interfaces;
+﻿using CommerceApi.BLL.Services;
 using CommerceApi.DTO.DTOS;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -20,14 +20,14 @@ namespace CommerceApi.Controllers
         // Takes Public or Secret Key
         [HttpGet("{itemId}")]
         [AllowAnonymous]
-        [ProducesResponseType(200, Type = typeof(ItemDto))]
+        [ProducesResponseType(200, Type = typeof(ProductDto))]
         public ActionResult GetItemById(int itemId)
         {
             try
             {
                 string key = Request.Headers["X-Authorization"];
 
-                ItemDto dto = _service.GetItemById(key, itemId);
+                ProductDto dto = _service.GetItemById(key, itemId);
 
                 return Ok(dto);
             }
@@ -49,7 +49,7 @@ namespace CommerceApi.Controllers
         // Takes Secret Key
         [HttpPut("{itemId}")]
         [AllowAnonymous]
-        [ProducesResponseType(200, Type = typeof(ItemDto))]
+        [ProducesResponseType(200, Type = typeof(ProductDto))]
         public ActionResult UpdateItem(int itemId, string update)
         {
             if (!ModelState.IsValid)

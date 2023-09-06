@@ -1,6 +1,6 @@
 ﻿using System.Linq.Expressions;
 
-namespace CommerceApi.DAL.Interfaces
+namespace CommerceApi.DAL.Repositories
 {
     public interface IGenericRepository<TEntity>
     {

@@ -1,6 +1,6 @@
 ﻿using CommerceApi.DTO.DTOS;
 
-namespace CommerceApi.BLL.Interfaces
+namespace CommerceApi.BLL.Services
 {
     public interface ICartService
     {

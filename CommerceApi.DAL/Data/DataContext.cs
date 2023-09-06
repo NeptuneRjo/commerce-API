@@ -73,7 +73,7 @@ namespace CommerceApi.DAL.Data
                 .HasOne(u => u.Cart)
                 .WithOne(u => u.User)
                 .HasForeignKey<Cart>(u => u.UserId);
-        
+
             // User ~ WishList Relationship
             modelBuilder.Entity<User>()
                 .HasOne(u => u.WishList)

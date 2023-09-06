@@ -2,7 +2,7 @@
 using CommerceApi.DAL.Entities;
 using CommerceApi.DTO.DTOS;
 
-namespace CommerceApi.BLL.Utilities.AutoMapperProfiles
+namespace CommerceApi.BLL.Utilities
 {
     public class AutoMapperProfiles : Profile
     {

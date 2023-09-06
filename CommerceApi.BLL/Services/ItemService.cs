@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
-using CommerceApi.BLL.Interfaces;
-using CommerceApi.DAL.Interfaces;
+using CommerceApi.DAL.Repositories;
 using CommerceApi.DTO.DTOS;
 using System.Reflection;
 
@@ -40,7 +39,7 @@ namespace CommerceApi.BLL.Services
             }
         }
 
-        public ItemDto GetItemById(string key, int itemId)
+        public ProductDto GetItemById(string key, int itemId)
         {
             //Product item = _repository.GetByQuery(e => e.Id == itemId);
 
@@ -52,10 +51,10 @@ namespace CommerceApi.BLL.Services
 
             //ItemDto dto = _mapper.Map<ItemDto>(item);
 
-            return new ItemDto();
+            return new ProductDto();
         }
 
-        public ItemDto UpdateItem(string key, int itemId)
+        public ProductDto UpdateItem(string key, int itemId)
         {
             //Product item = _repository.GetByQuery(e => e.Id == itemId);
 
@@ -87,7 +86,7 @@ namespace CommerceApi.BLL.Services
 
             //ItemDto dto = _mapper.Map<ItemDto>(item);
 
-            return new ItemDto();
+            return new ProductDto();
         }
     }
 }

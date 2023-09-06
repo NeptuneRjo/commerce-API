@@ -1,14 +1,13 @@
 ﻿using CommerceApi.DAL.Data;
 using CommerceApi.DAL.Entities;
-using CommerceApi.DAL.Interfaces;
 
-namespace CommerceApi.DAL.Repository
+namespace CommerceApi.DAL.Repositories
 {
     public class ItemRepository : GenericRepository<Product>, IItemRepository
     {
         private readonly DataContext _context;
 
-        public ItemRepository(DataContext context) : base(context) 
+        public ItemRepository(DataContext context) : base(context)
         {
             _context = context;
         }

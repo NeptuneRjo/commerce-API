@@ -1,8 +1,7 @@
 ﻿using CommerceApi.DAL.Data;
 using CommerceApi.DAL.Entities;
-using CommerceApi.DAL.Interfaces;
 
-namespace CommerceApi.DAL.Repository
+namespace CommerceApi.DAL.Repositories
 {
     public class CartRepository : GenericRepository<Cart>, ICartRepository
     {
@@ -28,7 +27,7 @@ namespace CommerceApi.DAL.Repository
         //    _context.CartItems.Add(cartItem);
 
         //    cart.CartItems.Add(cartItem);
-            
+
         //    _context.SaveChanges();
 
         //    return cart;
@@ -59,7 +58,7 @@ namespace CommerceApi.DAL.Repository
             //    throw new ObjectNotFoundException($"No cart with the id {cartId} found");
 
             //CartItem cartItem = _context.CartItems.First(e => e.ItemId == itemId);
-            
+
             //if (cartItem == null)
             //    throw new ObjectNotFoundException($"No cart item with the item id {itemId} found");
 
@@ -68,7 +67,7 @@ namespace CommerceApi.DAL.Repository
 
             return cart;
         }
-       
+
         public Cart UpdateInfo(Cart cart)
         {
 
@@ -102,7 +101,7 @@ namespace CommerceApi.DAL.Repository
             //cartItem.Quantity = quantity;
             //cartItem.Price = item.Price;
             //cartItem.Total = quantity * cartItem.Price;
-            
+
             //_context.CartItems.Update(cartItem);
             _context.SaveChanges();
 

@@ -1,6 +1,6 @@
 ﻿using CommerceApi.DTO.DTOS;
 
-namespace CommerceApi.BLL.Interfaces
+namespace CommerceApi.BLL.Services
 {
     public interface IItemService
     {
@@ -9,16 +9,16 @@ namespace CommerceApi.BLL.Interfaces
         /// </summary>
         /// <param name="key"></param>
         /// <param name="itemId"></param>
-        /// <returns>The found <see cref="ItemDto"/> object</returns>
-        ItemDto GetItemById(string key, int itemId);
+        /// <returns>The found <see cref="ProductDto"/> object</returns>
+        ProductDto GetItemById(string key, int itemId);
         /// <summary>
         /// Queries the database for the item that matches the id and updates its properties
         /// </summary>
         /// <param name="key"></param>
         /// <param name="itemId"></param>
         /// <param name="update"></param>
-        /// <returns>The updated <see cref="ItemDto"/> object</returns>
-        ItemDto UpdateItem(string secrretKey, int itemId);
+        /// <returns>The updated <see cref="ProductDto"/> object</returns>
+        ProductDto UpdateItem(string secrretKey, int itemId);
         /// <summary>
         /// Queries the database for the item that matches the id and deletes it
         /// </summary>

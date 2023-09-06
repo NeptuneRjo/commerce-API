@@ -1,7 +1,5 @@
-﻿using CommerceApi.BLL.Interfaces;
-using System.Linq.Expressions;
-using CommerceApi.DAL.Repository;
-using CommerceApi.DAL.Interfaces;
+﻿using System.Linq.Expressions;
+using CommerceApi.DAL.Repositories;
 using CommerceApi.DTO.DTOS;
 using CommerceApi.DAL.Entities;
 using AutoMapper;
