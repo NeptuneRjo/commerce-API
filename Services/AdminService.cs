@@ -12,7 +12,7 @@ namespace CommerceClone.Services
         private readonly IAdminRepository _repository;
         private readonly IMapper _mapper;
 
-        private Expression<Func<Admin, object>>[] includes = { e => e.Stores };
+        //private Expression<Func<Admin, object>>[] includes = { e => e.Stores };
 
         public AdminService(IAdminRepository repository, IMapper mapper)
         {
@@ -34,8 +34,8 @@ namespace CommerceClone.Services
             admin = _repository.GenerateKeys(admin);
             admin.Password = _repository.EncryptPass(admin.Password);
 
-            if (admin.Stores == null)
-                admin.Stores = new List<Store>();
+            //if (admin.Stores == null)
+            //    admin.Stores = new List<Store>();
 
             _repository.Add(admin);
 
@@ -71,7 +71,7 @@ namespace CommerceClone.Services
         {
             var (email, password) = adminModel;
 
-            Admin admin = _repository.GetByQuery(e => e.Email == email, includes);
+            Admin admin = _repository.GetByQuery(e => e.Email == email);
 
             if (admin == null)
                 throw new ObjectNotFoundException($"No admin with the email: {email} found");

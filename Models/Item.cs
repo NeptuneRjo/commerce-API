@@ -10,10 +10,6 @@ namespace CommerceClone.Models
         public string Description { get; set; }
         public byte[] Image { get; set; }
         public int Count { get; set; }
-
-        public Store? Store { get; set; }
-        [JsonPropertyName("store_id")]
-        public int StoreId { get; set; }
     }
 
     public class ItemModel

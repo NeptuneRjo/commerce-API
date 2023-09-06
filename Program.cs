@@ -13,14 +13,12 @@ services.AddControllersWithViews();
 // Repositories
 services.AddScoped<IAdminRepository, AdminRepository>();
 services.AddScoped<IItemRepository, ItemRepository>();
-services.AddScoped<IStoreRepository, StoreRepository>();
 services.AddScoped<ICartRepository, CartRepository>();
 
 // Data
 services.AddScoped<IDataContext, DataContext>();
 
 // Services
-services.AddScoped<IStoreService, StoreService>();
 services.AddScoped<IAdminService, AdminService>();
 services.AddScoped<ICartService, CartService>();
 services.AddScoped<IItemService, ItemService>();
@@ -28,8 +26,8 @@ services.AddScoped<IItemService, ItemService>();
 services.AddDbContext<DataContext>(options =>
 {
     var azureConnectionString = builder.Configuration.GetConnectionString("AZURE_SQL_CONNECTIONSTRING");
-    options.UseSqlServer(azureConnectionString);
-    //options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+    var defaultConnectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+    options.UseSqlServer(defaultConnectionString);
 });
 
 services.AddAutoMapper(typeof(Program));

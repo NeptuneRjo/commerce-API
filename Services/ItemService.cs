@@ -13,7 +13,7 @@ namespace CommerceClone.Services
         private readonly IItemRepository _repository;
         private readonly IMapper _mapper;
 
-        private Expression<Func<Item, object>>[] includes = { e => e.Store, e => e.Store.Admin };
+        //private Expression<Func<Item, object>>[] includes = { e => e.Store, e => e.Store.Admin };
 
         public ItemService(IItemRepository repository, IMapper mapper)
         {
@@ -23,13 +23,13 @@ namespace CommerceClone.Services
 
         public bool DeleteItem(string key, int itemId)
         {
-            Item item = _repository.GetByQuery(e => e.Id == itemId, includes);
+            Item item = _repository.GetByQuery(e => e.Id == itemId);
 
             if (item == null)
                 throw new ObjectNotFoundException($"No item with the id: {itemId} was found");
 
-            if (!_repository.PrivateAuth(key, item.Store.Admin))
-                throw new UnauthorizedAccessException("Invalid credentials");
+            //if (!_repository.PrivateAuth(key, item.Store.Admin))
+            //    throw new UnauthorizedAccessException("Invalid credentials");
 
             try
             {
@@ -44,13 +44,13 @@ namespace CommerceClone.Services
 
         public ItemDto GetItemById(string key, int itemId)
         {
-            Item item = _repository.GetByQuery(e => e.Id == itemId, includes);
+            Item item = _repository.GetByQuery(e => e.Id == itemId);
 
             if (item == null)
                 throw new ObjectNotFoundException($"No item with the id: {itemId} was found");
 
-            if (!_repository.PublicAuth(key, item.Store.Admin))
-                throw new UnauthorizedAccessException("Invalid credentials");
+            //if (!_repository.PublicAuth(key, item.Store.Admin))
+                //throw new UnauthorizedAccessException("Invalid credentials");
 
             ItemDto dto = _mapper.Map<ItemDto>(item);
 
@@ -59,13 +59,13 @@ namespace CommerceClone.Services
 
         public ItemDto UpdateItem(string key, int itemId, ItemModelUpdate update)
         {
-            Item item = _repository.GetByQuery(e => e.Id == itemId, includes);
+            Item item = _repository.GetByQuery(e => e.Id == itemId);
 
             if (item == null)
                 throw new ObjectNotFoundException($"No item with the id: {itemId} was found");
 
-            if (!_repository.PrivateAuth(key, item.Store.Admin))
-                throw new UnauthorizedAccessException("Invalid credentials");
+            //if (!_repository.PrivateAuth(key, item.Store.Admin))
+            //    throw new UnauthorizedAccessException("Invalid credentials");
 
             Type modelType = update.GetType();
             PropertyInfo[] properties = modelType.GetProperties();

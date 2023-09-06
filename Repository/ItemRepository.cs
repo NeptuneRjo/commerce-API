@@ -14,32 +14,34 @@ namespace CommerceClone.Repository
 
         public Item AddByEmail(string email, int storeId, Item item)
         {
-            Store store = _context.Stores.Find(storeId);
+            //Store store = _context.Stores.Find(storeId);
 
-            item.Store = store;
+            //item.Store = store;
 
-            _context.Items.Add(item);
+            //_context.Items.Add(item);
 
-            store.Items.Add(item);
+            //store.Items.Add(item);
 
-            _context.SaveChanges();
+            //_context.SaveChanges();
 
-            return item;
+            //return item;
+            return new Item();
         }
 
         public Item AddByKey(string sk, int storeId, Item item)
         {
-            Store store = _context.Stores.Find(storeId);
+            //Store store = _context.Stores.Find(storeId);
 
-            item.Store = store;
+            //item.Store = store;
 
-            _context.Items.Add(item);
+            //_context.Items.Add(item);
 
-            store.Items.Add(item);
+            //store.Items.Add(item);
 
-            _context.SaveChanges();
+            //_context.SaveChanges();
 
-            return item;
+            //return item;
+            return new Item();
         }
     }
 }

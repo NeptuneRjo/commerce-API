@@ -16,24 +16,11 @@ namespace CommerceClone.Data
 
         public DbSet<Item> Items { get; set; }
 
-        public DbSet<Store> Stores { get; set; }
 
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-
-            modelBuilder.Entity<Admin>()
-                .HasMany(e => e.Stores)
-                .WithOne(e => e.Admin)
-                .HasForeignKey(e => e.AdminId)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            modelBuilder.Entity<Store>()
-                .HasMany(e => e.Items)
-                .WithOne(e => e.Store)
-                .HasForeignKey(e => e.StoreId)
-                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Cart>()
                 .HasMany(e => e.CartItems)

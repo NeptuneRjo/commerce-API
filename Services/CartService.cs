@@ -13,8 +13,6 @@ namespace CommerceClone.Services
         private readonly IMapper _mapper;
 
         private Expression<Func<Cart, object>>[] includes = { 
-            e => e.Store, 
-            e => e.Store.Admin, 
             e => e.CartItems 
         }; 
 
@@ -31,8 +29,8 @@ namespace CommerceClone.Services
             if (cart == null)
                 throw new ObjectNotFoundException($"No cart found with the id: {id}");
 
-            if (!_repository.PublicAuth(key, cart.Store.Admin))
-                throw new UnauthorizedAccessException("Key is invalid");
+            //if (!_repository.PublicAuth(key, cart.Store.Admin))
+            //    throw new UnauthorizedAccessException("Key is invalid");
 
             CartItem item = _mapper.Map<CartItem>(model);
 
@@ -51,8 +49,8 @@ namespace CommerceClone.Services
             if (cart == null)
                 throw new ObjectNotFoundException($"No cart found with the id: {id}");
 
-            if (!_repository.PublicAuth(key, cart.Store.Admin))
-                throw new UnauthorizedAccessException("Key is invalid");
+            //if (!_repository.PublicAuth(key, cart.Store.Admin))
+            //    throw new UnauthorizedAccessException("Key is invalid");
 
             try
             {
@@ -73,8 +71,8 @@ namespace CommerceClone.Services
             if (cart == null)
                 throw new ObjectNotFoundException($"No cart found with the id: {id}");
 
-            if (!_repository.PublicAuth(key, cart.Store.Admin))
-                throw new UnauthorizedAccessException("Key is invalid");
+            //if (!_repository.PublicAuth(key, cart.Store.Admin))
+            //    throw new UnauthorizedAccessException("Key is invalid");
 
             cart = _repository.ClearItems(cart);
             cart = _repository.UpdateInfo(cart);
@@ -91,8 +89,8 @@ namespace CommerceClone.Services
             if (cart == null)
                 throw new ObjectNotFoundException($"No cart found with the id: {id}");
 
-            if (!_repository.PublicAuth(key, cart.Store.Admin))
-                throw new UnauthorizedAccessException("Key is invalid");
+            //if (!_repository.PublicAuth(key, cart.Store.Admin))
+            //    throw new UnauthorizedAccessException("Key is invalid");
 
             // Verifiy the cart info is up to date
             cart = _repository.UpdateInfo(cart);
@@ -109,8 +107,8 @@ namespace CommerceClone.Services
             if (cart == null)
                 throw new ObjectNotFoundException($"No cart found with the id: {id}");
 
-            if (!_repository.PublicAuth(key, cart.Store.Admin))
-                throw new UnauthorizedAccessException("Key is invalid");
+            //if (!_repository.PublicAuth(key, cart.Store.Admin))
+            //    throw new UnauthorizedAccessException("Key is invalid");
 
             if (model.Quantity == 0)
                 cart = _repository.RemoveItem(id, model.ItemId);

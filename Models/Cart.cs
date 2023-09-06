@@ -14,9 +14,6 @@ namespace CommerceClone.Models
         [JsonPropertyName("cart_items")]
         public ICollection<CartItem>? CartItems { get; set; }
 
-        public Store Store { get; set; }
-        public int StoreId { get; set; }
-
         public Cart()
         {
             CartItems = new List<CartItem>();
@@ -30,12 +27,6 @@ namespace CommerceClone.Models
 
             Subtotal = CartItems.Sum(e => e.Total);
         }
-    }
-
-    public class CartModel
-    {
-        [JsonPropertyName("store_id")]
-        public int StoreId { get; set; }
     }
 
     public class UpdateCartModel

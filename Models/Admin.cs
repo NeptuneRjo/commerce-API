@@ -9,9 +9,6 @@ namespace CommerceClone.Models
         public string Email { get; set; }
         public string Password { get; set; }
 
-        [JsonPropertyName("stores")]
-        public ICollection<Store>? Stores{ get; set; }
-
         [JsonPropertyName("secret_key")]
         public string SecretKey { get; set; } = "";
 
