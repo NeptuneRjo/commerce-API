@@ -1,7 +1,7 @@
 ﻿using CommerceApi.DAL.Entities;
 using System.Linq.Expressions;
 
-namespace CommerceClone.Interfaces
+namespace CommerceApi.DAL.Interfaces
 {
     public interface IRepository<TEntity>
     {

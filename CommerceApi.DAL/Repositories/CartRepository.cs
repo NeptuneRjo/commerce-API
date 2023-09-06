@@ -1,6 +1,6 @@
 ﻿using CommerceApi.DAL.Data;
 using CommerceApi.DAL.Entities;
-using CommerceClone.Interfaces;
+using CommerceApi.DAL.Interfaces;
 
 namespace CommerceApi.DAL.Repository
 {

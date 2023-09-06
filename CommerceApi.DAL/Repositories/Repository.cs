@@ -1,5 +1,5 @@
 ﻿using CommerceApi.DAL.Data;
-using CommerceClone.Interfaces;
+using CommerceApi.DAL.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 

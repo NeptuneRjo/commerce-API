@@ -1,6 +1,6 @@
 ﻿using CommerceApi.DAL.Entities;
 
-namespace CommerceClone.Interfaces
+namespace CommerceApi.DAL.Interfaces
 {
     public interface IItemRepository : IRepository<Product>
     {
