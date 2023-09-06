@@ -1,6 +1,8 @@
 ﻿using CommerceApi.BLL.Interfaces;
 using CommerceApi.BLL.Services;
 using CommerceApi.BLL.Utilities.AutoMapperProfiles;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace CommerceApi.BLL
 {
