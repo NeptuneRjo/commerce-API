@@ -1,4 +1,6 @@
 ﻿using CommerceApi.DAL.Data;
+using CommerceApi.DAL.Interfaces;
+using CommerceApi.DAL.Repository;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -9,6 +11,9 @@ namespace CommerceApi.DAL
     {
         public static void RegisterDALDependencies(this IServiceCollection services, IConfiguration Configuration)
         {
+            services.AddScoped<ICartRepository, CartRepository>();
+            services.AddScoped<IItemRepository, ItemRepository>();
+
             services.AddDbContext<DataContext>(options =>
             {
                 var azureConnectionString = Configuration.GetConnectionString("AZURE_SQL_CONNECTIONSTRING");
