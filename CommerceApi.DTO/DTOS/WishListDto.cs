@@ -1,11 +1,16 @@
-﻿using System.Text.Json.Serialization;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Text.Json.Serialization;
+using System.Threading.Tasks;
 
 namespace CommerceApi.DTO.DTOS
 {
-    public class CartDto
+    public class WishListDto
     {
-        [JsonPropertyName("cart_id")]
-        public int CartId { get; set; }
+        [JsonPropertyName("wishlist_id")]
+        public int WishListId { get; set; }
 
         [JsonPropertyName("total_items")]
         public int TotalItems { get; set; }
@@ -17,5 +22,7 @@ namespace CommerceApi.DTO.DTOS
 
         [JsonPropertyName("cart_products")]
         public ICollection<CartProductDto> CartProducts { get; set; }
+
+
     }
 }
