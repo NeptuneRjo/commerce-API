@@ -4,6 +4,7 @@ using CommerceApi.DAL.Repository;
 using CommerceApi.DAL.Interfaces;
 using CommerceApi.DTO.DTOS;
 using CommerceApi.DAL.Entities;
+using AutoMapper;
 
 namespace CommerceApi.BLL.Services
 {
@@ -36,29 +37,24 @@ namespace CommerceApi.BLL.Services
             //cart = _repository.AddItem(cart, item);
             //cart = _repository.UpdateInfo(cart);
 
-            CartDto dto = _mapper.Map<CartDto>(cart);
+            //CartDto dto = _mapper.Map<CartDto>(cart);
 
-            return dto;
-        }
-
-        public CartDto AddItemToCart(string secretKey, int cartId)
-        {
-            throw new NotImplementedException();
+            return new CartDto();
         }
 
         public bool DeleteCart(string key, int id)
         {
-            Cart cart = _repository.GetByQuery(e => e.Id == id, includes);
+            //Cart cart = _repository.GetByQuery(e => e.Id == id, includes);
 
-            if (cart == null)
-                throw new ObjectNotFoundException($"No cart found with the id: {id}");
+            //if (cart == null)
+            //    throw new ObjectNotFoundException($"No cart found with the id: {id}");
 
             //if (!_repository.PublicAuth(key, cart.Store.Admin))
             //    throw new UnauthorizedAccessException("Key is invalid");
 
             try
             {
-                _repository.Delete(cart.Id);
+                //_repository.Delete(cart.Id);
                 return true;
             }
             catch
@@ -70,75 +66,65 @@ namespace CommerceApi.BLL.Services
 
         public CartDto EmptyCart(string key, int id)
         {
-            Cart cart = _repository.GetByQuery(e => e.Id == id, includes);
+            //Cart cart = _repository.GetByQuery(e => e.Id == id, includes);
 
-            if (cart == null)
-                throw new ObjectNotFoundException($"No cart found with the id: {id}");
+            //if (cart == null)
+            //    throw new ObjectNotFoundException($"No cart found with the id: {id}");
 
-            //if (!_repository.PublicAuth(key, cart.Store.Admin))
-            //    throw new UnauthorizedAccessException("Key is invalid");
+            ////if (!_repository.PublicAuth(key, cart.Store.Admin))
+            ////    throw new UnauthorizedAccessException("Key is invalid");
 
-            cart = _repository.ClearItems(cart);
-            cart = _repository.UpdateInfo(cart);
+            //cart = _repository.ClearItems(cart);
+            //cart = _repository.UpdateInfo(cart);
 
-            CartDto dto = _mapper.Map<CartDto>(cart);
+            //CartDto dto = _mapper.Map<CartDto>(cart);
 
-            return dto;
+            return new CartDto();
         }
 
         public CartDto GetCart(string key, int id)
         {
-            Cart cart = _repository.GetByQuery(e => e.Id == id, includes);
+            //Cart cart = _repository.GetByQuery(e => e.Id == id, includes);
 
-            if (cart == null)
-                throw new ObjectNotFoundException($"No cart found with the id: {id}");
+            //if (cart == null)
+            //    throw new ObjectNotFoundException($"No cart found with the id: {id}");
 
-            //if (!_repository.PublicAuth(key, cart.Store.Admin))
-            //    throw new UnauthorizedAccessException("Key is invalid");
+            ////if (!_repository.PublicAuth(key, cart.Store.Admin))
+            ////    throw new UnauthorizedAccessException("Key is invalid");
 
-            // Verifiy the cart info is up to date
-            cart = _repository.UpdateInfo(cart);
+            //// Verifiy the cart info is up to date
+            //cart = _repository.UpdateInfo(cart);
 
-            CartDto dto = _mapper.Map<CartDto>(cart);
+            //CartDto dto = _mapper.Map<CartDto>(cart);
 
-            return dto;
+            return new CartDto();
         }
 
-        public CartDto UpdateItemInCart(string key, int id, UpdateCartModel model)
+        public CartDto UpdateItemInCart(string key, int id)
         {
-            Cart cart = _repository.GetByQuery(e => e.Id == id, includes);
+            //Cart cart = _repository.GetByQuery(e => e.Id == id, includes);
 
-            if (cart == null)
-                throw new ObjectNotFoundException($"No cart found with the id: {id}");
+            //if (cart == null)
+            //    throw new ObjectNotFoundException($"No cart found with the id: {id}");
 
-            //if (!_repository.PublicAuth(key, cart.Store.Admin))
-            //    throw new UnauthorizedAccessException("Key is invalid");
+            ////if (!_repository.PublicAuth(key, cart.Store.Admin))
+            ////    throw new UnauthorizedAccessException("Key is invalid");
 
-            if (model.Quantity == 0)
-                cart = _repository.RemoveItem(id, model.ItemId);
-            else
-                cart = _repository.UpdateItem(id, model.ItemId, model.Quantity);
+            //if (model.Quantity == 0)
+            //    cart = _repository.RemoveItem(id, model.ItemId);
+            //else
+            //    cart = _repository.UpdateItem(id, model.ItemId, model.Quantity);
 
-            cart = _repository.UpdateInfo(cart);
+            //cart = _repository.UpdateInfo(cart);
 
-            CartDto dto = _mapper.Map<CartDto>(cart);
+            //CartDto dto = _mapper.Map<CartDto>(cart);
 
-            return dto;
+            return new CartDto();
         }
 
-        public CartDto UpdateItemInCart(string secretKey, int cartId)
-        {
-            throw new NotImplementedException();
-        }
-
-        CartDto ICartService.EmptyCart(string secretKey, int cartId)
-        {
-            throw new NotImplementedException();
-        }
-
-        CartDto ICartService.GetCart(string key, int cartId)
-        {
-            throw new NotImplementedException();
-        }
+        //public CartDto UpdateItemInCart(string secretKey, int cartId)
+        //{
+        //    throw new NotImplementedException();
+        //}
     }
 }
