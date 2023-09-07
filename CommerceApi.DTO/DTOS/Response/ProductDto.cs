@@ -38,7 +38,7 @@ namespace CommerceApi.DTO.DTOS
         public DateTime UpdatedAt { get; set; }
 
         [JsonPropertyName("reviews")]
-        public ICollection<string> ProductReviews { get; set; }
+        public ICollection<ProductReviewDto> ProductReviews { get; set; }
 
     }
 }
