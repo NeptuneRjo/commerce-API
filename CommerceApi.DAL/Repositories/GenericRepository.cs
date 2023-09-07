@@ -4,10 +4,6 @@ using System.Linq.Expressions;
 
 namespace CommerceApi.DAL.Repositories
 {
-    /// <summary>
-    /// Defines generic repository CRUD behaviors
-    /// </summary>
-    /// <typeparam name="TEntity"></typeparam>
     public class GenericRepository<TEntity> : IGenericRepository<TEntity> where TEntity : class
     {
         private readonly DataContext _context;
@@ -17,25 +13,25 @@ namespace CommerceApi.DAL.Repositories
             _context = context;
         }
 
-        public TEntity Add(TEntity entity)
+        public async Task<TEntity> Add(TEntity entity)
         {
-            _context.Set<TEntity>().Add(entity);
-            _context.SaveChanges();
+            await _context.Set<TEntity>().AddAsync(entity);
+            await _context.SaveChangesAsync();
             return entity;
         }
-
-        public void AddRange(IEnumerable<TEntity> entities)
+        public async Task<ICollection<TEntity>> AddRange(ICollection<TEntity> entities)
         {
-            _context.Set<TEntity>().AddRange(entities);
-            _context.SaveChanges();
+            await _context.Set<TEntity>().AddRangeAsync(entities);
+            await _context.SaveChangesAsync();
+            return entities;
         }
 
-        public ICollection<TEntity> GetAll()
+        public async Task<ICollection<TEntity>> GetAll()
         {
-            return _context.Set<TEntity>().ToList();
+            return await _context.Set<TEntity>().ToListAsync();
         }
 
-        public TEntity GetByQuery(Expression<Func<TEntity, bool>> predicate, params Expression<Func<TEntity, object>>[] includes)
+        public async Task<TEntity> GetByQuery(Expression<Func<TEntity, bool>> predicate, params Expression<Func<TEntity, object>>[] includes)
         {
             IQueryable<TEntity> query = _context.Set<TEntity>().AsNoTracking();
 
@@ -44,11 +40,11 @@ namespace CommerceApi.DAL.Repositories
                 query = query.Include(include);
             }
 
-            return query.FirstOrDefault(predicate);
+            return await query.FirstOrDefaultAsync(predicate);
         }
 
 
-        public ICollection<TEntity> GetAllByQuery(Expression<Func<TEntity, bool>> predicate, params Expression<Func<TEntity, object>>[] includes)
+        public async Task<ICollection<TEntity>> GetAllByQuery(Expression<Func<TEntity, bool>> predicate, params Expression<Func<TEntity, object>>[] includes)
         {
             IQueryable<TEntity> query = _context.Set<TEntity>().AsNoTracking();
 
@@ -57,40 +53,30 @@ namespace CommerceApi.DAL.Repositories
                 query = query.Include(include);
             }
 
-            return query.Where(predicate).ToList();
+            return await query.Where(predicate).ToListAsync();
         }
 
-        public void Update(int id, TEntity entity)
+        public async Task<TEntity> Update(int id, TEntity entity)
         {
-            var foundEntity = _context.Set<TEntity>().Find(id);
+            TEntity foundEntity = await _context.Set<TEntity>().FindAsync(id);
 
             _context.Set<TEntity>().Entry(foundEntity).CurrentValues.SetValues(entity);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
+
+            return foundEntity;
         }
 
-        public void Delete(int id)
+        public async Task Delete(int id)
         {
-            var entity = _context.Set<TEntity>().Find(id);
+            TEntity entity = await _context.Set<TEntity>().FindAsync(id);
 
             _context.Set<TEntity>().Remove(entity);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
 
-        public string GenerateUid(TEntity entity, string marker)
+        public async Task SaveChanges()
         {
-            string id;
-
-            do
-            {
-                id = Guid.NewGuid().ToString("N");
-            } while (_context.Set<TEntity>().Find($"{marker.ToLower()}_{id}") != null);
-
-            return id;
-        }
-
-        public void SaveChanges()
-        {
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
     }
 }
