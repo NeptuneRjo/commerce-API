@@ -7,13 +7,26 @@ namespace CommerceApi.Controllers
 {
     [ApiController]
     [Route("v1/items")]
-    public class ItemController : ControllerBase
+    public class ProductController : ControllerBase
     {
-        private readonly IItemService _service;
+        private readonly IProductService _service;
 
-        public ItemController(IItemService service)
+        public ProductController(IProductService service)
         {
             _service = service;
+        }
+
+        public async ActionResult GetItems()
+        {
+            try
+            {
+
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
         }
 
         // GET: v1/items/{item_id}
