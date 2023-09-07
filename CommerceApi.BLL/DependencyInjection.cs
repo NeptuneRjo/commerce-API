@@ -11,7 +11,7 @@ namespace CommerceApi.BLL
             services.AddAutoMapper(typeof(AutoMapperProfiles));
 
             services.AddScoped<ICartService, CartService>();
-            services.AddScoped<IItemService, ItemService>();
+            services.AddScoped<IProductService, ProductService>();
         }
     }
 }
