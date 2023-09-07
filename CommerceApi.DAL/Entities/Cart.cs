@@ -5,7 +5,7 @@ namespace CommerceApi.DAL.Entities
     public class Cart
     {
         [Key]
-        public int CartId { get; set; }
+        public string CartId { get; set; }
 
         public int TotalItems { get; set; }
 

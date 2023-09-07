@@ -5,7 +5,7 @@ namespace CommerceApi.DAL.Entities
     public class WishList
     {
         [Key]
-        public int WishListId { get; set; }
+        public string WishListId { get; set; }
 
         public int TotalItems { get; set; }
 

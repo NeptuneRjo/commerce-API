@@ -5,7 +5,7 @@ namespace CommerceApi.DAL.Entities
     public class User
     {
         [Key]
-        public int UserId { get; set; }
+        public string UserId { get; set; }
 
         [Required]
         public string Email { get; set; }
