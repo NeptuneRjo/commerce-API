@@ -38,7 +38,7 @@ namespace CommerceApi.DAL.Repositories
         /// <param name="predicate"></param>
         /// <param name="includes"></param>
         /// <returns>The retrieved <see cref="ICollection{TEntity}"/></returns>
-        Task<ICollection<TEntity>> GetAllByQuery(Expression<Func<TEntity, bool>> predicate, params Expression<Func<TEntity, object>>[] includes);
+        Task<ICollection<TEntity>> GetAllByQuery(params Expression<Func<TEntity, object>>[] includes);
         
         /// <summary>
         /// Update an entity asynchronously
@@ -46,14 +46,14 @@ namespace CommerceApi.DAL.Repositories
         /// <param name="id"></param>
         /// <param name="entity"></param>
         /// <returns>The updated <see cref="TEntity"/></returns>
-        Task<TEntity> Update(int id, TEntity entity);
+        Task<TEntity> Update(TEntity entity);
 
         /// <summary>
         /// Delete an entity asynchronously
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task Delete(int id);
+        Task Delete(TEntity entity);
 
         /// <summary>
         /// Save the context's changes asynchronously
