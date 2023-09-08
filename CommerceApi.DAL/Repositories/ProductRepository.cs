@@ -1,13 +1,14 @@
 ﻿using CommerceApi.DAL.Data;
 using CommerceApi.DAL.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace CommerceApi.DAL.Repositories
 {
-    public class ItemRepository : GenericRepository<Product>, IItemRepository
+    public class ProductRepository : GenericRepository<Product>, IProductRepository
     {
         private readonly DataContext _context;
 
-        public ItemRepository(DataContext context) : base(context)
+        public ProductRepository(DataContext context) : base(context)
         {
             _context = context;
         }
@@ -42,6 +43,13 @@ namespace CommerceApi.DAL.Repositories
 
             //return item;
             return new Product();
+        }
+
+        public async Task<Product> GetProductAsync(string id)
+        {
+            Product product = await this.GetByQuery(e => e.ProductId == id, e => e.ProductReviews);
+
+            return product;
         }
     }
 }
