@@ -10,11 +10,11 @@ namespace CommerceApi.BLL.Services
 {
     public class ProductService : IProductService
     {
-        private readonly IItemRepository _repository;
+        private readonly IProductRepository _repository;
         private readonly IMapper _mapper;
         private readonly ILogger<ProductService> _logger;
 
-        public ProductService(IItemRepository repository, IMapper mapper, ILogger<ProductService> logger)
+        public ProductService(IProductRepository repository, IMapper mapper, ILogger<ProductService> logger)
         {
             _mapper = mapper;
             _repository = repository;
@@ -23,10 +23,11 @@ namespace CommerceApi.BLL.Services
 
         public async Task<ICollection<ProductDto>> GetProductsAsync()
         {
-            ICollection<Product> products = await _repository.GetAllByQuery(e => e.ProductReviews);
+            ICollection<Product> products = await _repository.GetAll();
+
             _logger.LogInformation($"List of {products.Count} products has been returned");
-        
-            return _mapper.Map<ICollection<ProductDto>>(products);
+
+            return _mapper.Map<ICollection<ProductDto>>(products); ;
         }
 
         public async Task<ProductDto> GetProductAsync(string id)
@@ -36,7 +37,8 @@ namespace CommerceApi.BLL.Services
             Expression<Func<Product, bool>> query = e => e.ProductId == id;
             Expression<Func<Product, object>>[] includes = { e => e.ProductReviews };
 
-            Product product = await _repository.GetByQuery(query, includes);
+            //Product product = await _repository.GetByQuery(query);
+            Product product = await _repository.GetProductAsync(id);
 
             if (product is null)
             {
@@ -67,7 +69,7 @@ namespace CommerceApi.BLL.Services
 
         public async Task<ProductDto> UpdateProductAsync(ProductToUpdateDto productToUpdateDto)
         {
-            Product product = await _repository.GetByQuery(e => e.ProductId == productToUpdateDto.ProductId);
+            Product product = await _repository.GetProductAsync(productToUpdateDto.ProductId);
 
             if (product is null)
             {
@@ -86,7 +88,7 @@ namespace CommerceApi.BLL.Services
 
         public async Task DeleteProductAsync(string id)
         {
-            Product productToDelete = await _repository.GetByQuery(e => e.ProductId == id);
+            Product productToDelete = await _repository.GetProductAsync(id);
 
             if (productToDelete is null) 
             {
