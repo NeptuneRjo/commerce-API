@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CommerceApi.DAL.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20230906232825_InitialCreate")]
+    [Migration("20230907223148_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -27,11 +27,8 @@ namespace CommerceApi.DAL.Migrations
 
             modelBuilder.Entity("CommerceApi.DAL.Entities.Cart", b =>
                 {
-                    b.Property<int>("CartId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CartId"));
+                    b.Property<string>("CartId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<decimal>("Subtotal")
                         .HasColumnType("decimal(18,2)");
@@ -42,8 +39,9 @@ namespace CommerceApi.DAL.Migrations
                     b.Property<int>("TotalUniqueItems")
                         .HasColumnType("int");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("CartId");
 
@@ -55,11 +53,11 @@ namespace CommerceApi.DAL.Migrations
 
             modelBuilder.Entity("CommerceApi.DAL.Entities.CartProduct", b =>
                 {
-                    b.Property<int>("CartId")
-                        .HasColumnType("int");
+                    b.Property<string>("CartId")
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
+                    b.Property<string>("ProductId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("CartProductQuantity")
                         .HasColumnType("int");
@@ -76,11 +74,8 @@ namespace CommerceApi.DAL.Migrations
 
             modelBuilder.Entity("CommerceApi.DAL.Entities.Product", b =>
                 {
-                    b.Property<int>("ProductId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ProductId"));
+                    b.Property<string>("ProductId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Brand")
                         .IsRequired()
@@ -135,11 +130,11 @@ namespace CommerceApi.DAL.Migrations
 
             modelBuilder.Entity("CommerceApi.DAL.Entities.ProductReview", b =>
                 {
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
+                    b.Property<string>("ProductId")
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<int>("ReviewId")
-                        .HasColumnType("int");
+                    b.Property<string>("ReviewId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("ProductId", "ReviewId");
 
@@ -150,11 +145,8 @@ namespace CommerceApi.DAL.Migrations
 
             modelBuilder.Entity("CommerceApi.DAL.Entities.Review", b =>
                 {
-                    b.Property<int>("ReviewId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ReviewId"));
+                    b.Property<string>("ReviewId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Content")
                         .IsRequired()
@@ -172,11 +164,8 @@ namespace CommerceApi.DAL.Migrations
 
             modelBuilder.Entity("CommerceApi.DAL.Entities.User", b =>
                 {
-                    b.Property<int>("UserId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UserId"));
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -198,11 +187,8 @@ namespace CommerceApi.DAL.Migrations
 
             modelBuilder.Entity("CommerceApi.DAL.Entities.WishList", b =>
                 {
-                    b.Property<int>("WishListId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("WishListId"));
+                    b.Property<string>("WishListId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<decimal>("Subtotal")
                         .HasColumnType("decimal(18,2)");
@@ -213,8 +199,9 @@ namespace CommerceApi.DAL.Migrations
                     b.Property<int>("TotalUniqueItems")
                         .HasColumnType("int");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("WishListId");
 
@@ -226,11 +213,11 @@ namespace CommerceApi.DAL.Migrations
 
             modelBuilder.Entity("CommerceApi.DAL.Entities.WishListProduct", b =>
                 {
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
+                    b.Property<string>("ProductId")
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<int>("WishListId")
-                        .HasColumnType("int");
+                    b.Property<string>("WishListId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("WishListProductQuantity")
                         .HasColumnType("int");
