@@ -17,7 +17,7 @@ namespace CommerceApi.DAL.Entities
         [Required]
         public decimal Price { get; set; }
 
-        public byte[] Image { get; set; }
+        //public byte[] Image { get; set; }
 
         public string SKU { get; set; }
 
