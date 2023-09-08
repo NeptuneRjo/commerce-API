@@ -11,7 +11,7 @@ using NSubstitute;
 using System.Linq.Expressions;
 using Xunit.Abstractions;
 
-namespace CommerceApi.Test.BLL.Services
+namespace CommerceApi.Test.Services
 {
     public class ProductServiceTests
     {
@@ -98,12 +98,12 @@ namespace CommerceApi.Test.BLL.Services
         public async Task GetProductsAsync_WhenSuccess_ReturnsProductDtoList()
         {
             ICollection<Product> products = new List<Product>() { _productEntity, _productEntity };
-            ICollection<ProductDto> productsDto = new List<ProductDto>() {  _productDto,  _productDto };
+            ICollection<ProductDto> productsDto = new List<ProductDto>() { _productDto, _productDto };
 
             _repository.GetAll().Returns(Task.FromResult(products));
 
             var result = await _service.GetProductsAsync();
-            
+
             Assert.Equal(2, result.Count);
             Assert.Equivalent(productsDto, result, strict: true);
         }
@@ -168,7 +168,7 @@ namespace CommerceApi.Test.BLL.Services
             await _repository.Received().Delete(Arg.Any<Product>());
         }
 
-        [Fact] 
+        [Fact]
         public async Task DeleteProductAsync_WhenProductDoesNotExists_ThrowsNotFoundException()
         {
             _repository.GetProductAsync(ProductId).Returns(Task.FromResult((Product)null!));
