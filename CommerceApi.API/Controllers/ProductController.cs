@@ -1,4 +1,5 @@
 ﻿using CommerceApi.BLL.Services;
+using CommerceApi.BLL.Utilities;
 using CommerceApi.DTO.DTOS;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -6,119 +7,101 @@ using Microsoft.AspNetCore.Mvc;
 namespace CommerceApi.Controllers
 {
     [ApiController]
-    [Route("v1/items")]
+    [Route("api/products")]
     public class ProductController : ControllerBase
     {
         private readonly IProductService _service;
+
+        private ObjectResult NotFoundMsg(string id) => NotFound($"Product with the ProductId = {id} was not found");
 
         public ProductController(IProductService service)
         {
             _service = service;
         }
 
-        public async ActionResult GetItems()
+        public async Task<IActionResult> GetProductsAsync()
         {
             try
             {
-
+                return Ok(await _service.GetProductsAsync());
             }
             catch (Exception)
             {
-
-                throw;
+                return BadRequest("Something went wrong");
             }
         }
 
-        // GET: v1/items/{item_id}
-        // Takes Public or Secret Key
-        [HttpGet("{itemId}")]
-        [AllowAnonymous]
-        [ProducesResponseType(200, Type = typeof(ProductDto))]
-        public ActionResult GetItemById(int itemId)
+        [HttpPost, Authorize]
+        public async Task<IActionResult> AddProductAsync(ProductToAddDto product)
         {
             try
             {
-                string key = Request.Headers["X-Authorization"];
-
-                ProductDto dto = _service.GetItemById(key, itemId);
-
-                return Ok(dto);
+                return Ok(await _service.AddProductAsync(product));
             }
-            //catch (ObjectNotFoundException ex)
-            //{
-            //    return NotFound(ex.Message);
-            //}
-            catch (UnauthorizedAccessException ex)
+            catch (Exception)
             {
-                return Unauthorized(ex.Message);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
+                return BadRequest("Something went wrong");
             }
         }
 
-        // PUT: v1/items/{item_id}
-        // Takes Secret Key
-        [HttpPut("{itemId}")]
-        [AllowAnonymous]
-        [ProducesResponseType(200, Type = typeof(ProductDto))]
-        public ActionResult UpdateItem(int itemId, string update)
+        // GET: api/products/{item_id}
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetProductAsync(string id)
+        {
+            try
+            {
+                return Ok(await _service.GetProductAsync(id));
+            }
+            catch (NotFoundException)
+            {
+                return NotFoundMsg(id);
+            }
+            catch (Exception)
+            { 
+                return BadRequest("Something went wrong");
+            }
+        }
+
+        // PUT: api/products/{item_id}
+        [HttpPut("{id}"), Authorize]
+        public async Task<IActionResult> UpdateProductAsync(string id, ProductToUpdateDto update)
         {
             if (!ModelState.IsValid)
-                return BadRequest();
+                return BadRequest(ModelState);
+
+            if (id != update.ProductId)
+                return BadRequest("Id does not match request body");
 
             try
             {
-                string key = Request.Headers["X-Authorization"];
-
-                //ItemDto dto = _service.UpdateItem(key, itemId, update);
-
-                return Ok();
+                return Ok(await _service.UpdateProductAsync(update));
             }
-            //catch (ObjectNotFoundException ex)
-            //{
-            //    return NotFound(ex.Message);
-            //}
-            catch (UnauthorizedAccessException ex)
+            catch (NotFoundException)
             {
-                return Unauthorized(ex.Message);
+                return NotFoundMsg(id);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                return StatusCode(500, ex.Message);
+                return BadRequest("Something went wrong");
             }
         }
 
-        // DELETE: v1/items/{item_id}
-        // Takes Secret Key
-        [HttpDelete("{itemId}")]
-        [AllowAnonymous]
-        [ProducesResponseType(200)]
-        public ActionResult DeleteItem(int itemId)
+        // DELETE: api/products/{item_id}
+        [HttpDelete("{id}"), Authorize]
+        public async Task<IActionResult> DeleteProductAsync(string id)
         {
             try
             {
-                string key = Request.Headers["X-Authorization"];
-
-                bool deleted = _service.DeleteItem(key, itemId);
-
-                if (!deleted)
-                    throw new Exception("Failed to delete item");
-
-                return Ok();
+                await _service.DeleteProductAsync(id);
+                return Ok($"Product with the ProductId = {id} was successfully deleted");
             }
-            //catch (ObjectNotFoundException ex)
-            //{
-            //    return NotFound(ex.Message);
-            //}
-            catch (UnauthorizedAccessException ex)
+            catch (NotFoundException)
             {
-                return Unauthorized(ex.Message);
+                return NotFoundMsg(id);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                return StatusCode(500, ex.Message);
+                return BadRequest("Something went wrong");
             }
         }
 
