@@ -1,4 +1,6 @@
-﻿using CommerceApi.DAL.Entities;
+﻿using AutoMapper;
+using CommerceApi.BLL.Utilities;
+using CommerceApi.DAL.Entities;
 using CommerceApi.DTO.DTOS;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -7,64 +9,14 @@ namespace CommerceApi.Test
 {
     public class TestUtilities
     {
-        public const string ProductId = "PROD_12345";
-        public readonly Product _productEntity;
-        public readonly ProductToAddDto _productToAddDto;
-        public readonly ProductToUpdateDto _productToUpdateDto;
-        public readonly ProductDto _productDto;
+        public readonly IMapper _mapper;
 
         public TestUtilities()
         {
-            _productEntity = new Product()
-            {
-                ProductId = ProductId,
-                Name = "ProductEntityName",
-                Description = "ProductEntityDesc",
-                Price = 0,
-                StockQuantity = 0,
-                Brand = "ProductEntityBrand",
-                ProductReviews = new List<ProductReview>(),
-                CreatedAt = new DateTime(),
-                UpdatedAt = new DateTime(),
-            };
+            var profile = new AutoMapperProfiles();
+            var configuration = new MapperConfiguration(cfg => cfg.AddProfile(profile));
 
-            _productDto = new ProductDto()
-            {
-                ProductId = ProductId,
-                Name = "ProductEntityName",
-                Description = "ProductEntityDesc",
-                Price = 0,
-                StockQuantity = 0,
-                Brand = "ProductEntityBrand",
-                ProductReviews = new List<ProductReviewDto>(),
-                CreatedAt = new DateTime(),
-                UpdatedAt = new DateTime(),
-            };
-
-            _productToAddDto = new ProductToAddDto()
-            {
-                Name = "ProductToAddName",
-                Description = "ProductToAddDesc",
-                Price = 0,
-                Category = "ProductToAddCat",
-                Brand = "ProductToAddBrand",
-                StockQuantity = 0,
-                InStock = false,
-                Currency = "ProductToAddCur"
-            };
-
-            _productToUpdateDto = new ProductToUpdateDto()
-            {
-                ProductId = ProductId,
-                Name = "ProductToUpdateName",
-                Description = "ProductToUpdateDesc",
-                Price = 0,
-                Category = "ProductToUpdateCat",
-                Brand = "ProductToUpdateBrand",
-                StockQuantity = 0,
-                InStock = false,
-                Currency = "ProductToUpdateCur"
-            };
+            _mapper = new Mapper(configuration);
         }
 
         /// <summary>
