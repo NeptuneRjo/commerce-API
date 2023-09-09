@@ -4,6 +4,7 @@ using CommerceApi.BLL.Utilities;
 using CommerceApi.DAL.Entities;
 using CommerceApi.DAL.Repositories;
 using CommerceApi.DTO.DTOS;
+using CommerceApi.Test.Utilities;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using Xunit.Abstractions;
@@ -17,28 +18,25 @@ namespace CommerceApi.Test.Services
         private readonly IProductService _service;
         private readonly IProductRepository _repository;
         private readonly ILogger<ProductService> _logger;
-        private readonly IMapper _mapper;
+
+        private readonly ProductEntityUtilities _utils;
 
         public ProductServiceTests(ITestOutputHelper output)
         {
             _output = output;
-
             _repository = Substitute.For<IProductRepository>();
             _logger = Substitute.For<ILogger<ProductService>>();
 
-            var profile = new AutoMapperProfiles();
-            var configuration = new MapperConfiguration(cfg => cfg.AddProfile(profile));
-
-            _mapper = new Mapper(configuration);
-
             _service = new ProductService(_repository, _mapper, _logger);
+
+            _utils = new ProductEntityUtilities();
         }
 
         [Fact]
         public async Task GetProductsAsync_WhenSuccess_ReturnsProductDtoList()
         {
-            ICollection<Product> products = new List<Product>() { _productEntity, _productEntity };
-            ICollection<ProductDto> productsDto = new List<ProductDto>() { _productDto, _productDto };
+            ICollection<Product> products = new List<Product>() { _utils.ProductEntity, _utils.ProductEntity };
+            ICollection<ProductDto> productsDto = new List<ProductDto>() { _utils.ProductDto, _utils.ProductDto };
 
             _repository.GetAll().Returns(Task.FromResult(products));
 
@@ -51,40 +49,40 @@ namespace CommerceApi.Test.Services
         [Fact]
         public async Task GetProductAsync_WhenSuccess_ReturnsProductDto()
         {
-            _repository.GetProductAsync(ProductId).Returns(Task.FromResult(_productEntity));
+            _repository.GetProductAsync(_utils.ProductId).Returns(Task.FromResult(_utils.ProductEntity));
 
-            var result = await _service.GetProductAsync(ProductId);
+            var result = await _service.GetProductAsync(_utils.ProductId);
 
             Assert.NotNull(result);
-            Assert.Equivalent(_productDto, result, strict: true);
+            Assert.Equivalent(_utils.ProductDto, result, strict: true);
         }
 
         [Fact]
         public async Task GetProductAsync_WhenProductDoesNotExist_ThrowsNotFoundException()
         {
-            _repository.GetProductAsync(ProductId).Returns(Task.FromResult((Product)null!));
+            _repository.GetProductAsync(_utils.ProductId).Returns(Task.FromResult((Product)null!));
 
-            await Assert.ThrowsAsync<NotFoundException>(() => _service.GetProductAsync(ProductId));
+            await Assert.ThrowsAsync<NotFoundException>(() => _service.GetProductAsync(_utils.ProductId));
         }
 
         [Fact]
         public async Task AddProductAsync_WhenSuccess_AddsThenReturnsProductDto()
         {
-            _repository.Add(Arg.Any<Product>()).Returns(Task.FromResult(_productEntity));
+            _repository.Add(Arg.Any<Product>()).Returns(Task.FromResult(_utils.ProductEntity));
 
-            var result = await _service.AddProductAsync(_productToAddDto);
+            var result = await _service.AddProductAsync(_utils.ProductToAddDto);
 
             Assert.IsType<ProductDto>(result);
-            Assert.Equal(_productEntity.ProductId, result.ProductId);
+            Assert.Equal(_utils.ProductEntity.ProductId, result.ProductId);
         }
 
         [Fact]
         public async Task UpdateProductAsync_WhenSuccess_UpdatesThenReturnsProductDto()
         {
-            _repository.GetProductAsync(ProductId).Returns(Task.FromResult(_productEntity));
-            _repository.Update(Arg.Any<Product>()).Returns(Task.FromResult(_productEntity));
+            _repository.GetProductAsync(_utils.ProductId).Returns(Task.FromResult(_utils.ProductEntity));
+            _repository.Update(Arg.Any<Product>()).Returns(Task.FromResult(_utils.ProductEntity));
 
-            var result = await _service.UpdateProductAsync(_productToUpdateDto);
+            var result = await _service.UpdateProductAsync(_utils.ProductToUpdateDto);
 
             Assert.IsType<ProductDto>(result);
             Assert.NotNull(result);
@@ -93,17 +91,17 @@ namespace CommerceApi.Test.Services
         [Fact]
         public async Task UpdateProductAsync_WhenProductDoesNotExist_ThrowsNotFoundException()
         {
-            _repository.GetProductAsync(ProductId).Returns(Task.FromResult((Product)null!));
+            _repository.GetProductAsync(_utils.ProductId).Returns(Task.FromResult((Product)null!));
 
-            await Assert.ThrowsAsync<NotFoundException>(() => _service.UpdateProductAsync(_productToUpdateDto));
+            await Assert.ThrowsAsync<NotFoundException>(() => _service.UpdateProductAsync(_utils.ProductToUpdateDto));
         }
 
         [Fact]
         public async Task DeleteProductAsync_WhenSuccess_CallsDelete()
         {
-            _repository.GetProductAsync(ProductId).Returns(Task.FromResult(_productEntity));
+            _repository.GetProductAsync(_utils.ProductId).Returns(Task.FromResult(_utils.ProductEntity));
 
-            await _service.DeleteProductAsync(ProductId);
+            await _service.DeleteProductAsync(_utils.ProductId);
 
             await _repository.Received().Delete(Arg.Any<Product>());
         }
@@ -111,9 +109,9 @@ namespace CommerceApi.Test.Services
         [Fact]
         public async Task DeleteProductAsync_WhenProductDoesNotExists_ThrowsNotFoundException()
         {
-            _repository.GetProductAsync(ProductId).Returns(Task.FromResult((Product)null!));
+            _repository.GetProductAsync(_utils.ProductId).Returns(Task.FromResult((Product)null!));
 
-            await Assert.ThrowsAsync<NotFoundException>(() => _service.DeleteProductAsync(ProductId));
+            await Assert.ThrowsAsync<NotFoundException>(() => _service.DeleteProductAsync(_utils.ProductId));
         }
     }
 }
