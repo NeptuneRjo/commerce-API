@@ -30,7 +30,7 @@ namespace CommerceApi.DAL.Repositories
         /// <param name="predicate"></param>
         /// <param name="includes"></param>
         /// <returns>The retrieved <see cref="TEntity"/></returns>
-        Task<TEntity> GetByQuery(Expression<Func<TEntity, bool>> predicate, params Expression<Func<TEntity, object>>[] includes);
+        Task<TEntity> GetByQuery(Expression<Func<TEntity, bool>>? filter, params Expression<Func<TEntity, object>>[] includes);
 
         /// <summary>
         /// Retrieve a collection of entities by a query asynchronously
@@ -38,7 +38,7 @@ namespace CommerceApi.DAL.Repositories
         /// <param name="predicate"></param>
         /// <param name="includes"></param>
         /// <returns>The retrieved <see cref="ICollection{TEntity}"/></returns>
-        Task<ICollection<TEntity>> GetAllByQuery(params Expression<Func<TEntity, object>>[] includes);
+        Task<ICollection<TEntity>> GetAllByQuery(Expression<Func<TEntity, bool>>? predicate, params Expression<Func<TEntity, object>>[] includes);
         
         /// <summary>
         /// Update an entity asynchronously

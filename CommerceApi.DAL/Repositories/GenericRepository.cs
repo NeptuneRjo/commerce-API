@@ -31,7 +31,7 @@ namespace CommerceApi.DAL.Repositories
             return await _context.Set<TEntity>().ToListAsync();
         }
 
-        public async Task<TEntity> GetByQuery(Expression<Func<TEntity, bool>> predicate, params Expression<Func<TEntity, object>>[] includes)
+        public async Task<TEntity> GetByQuery(Expression<Func<TEntity, bool>>? filter, params Expression<Func<TEntity, object>>[] includes)
         {
             IQueryable<TEntity> query = _context.Set<TEntity>().AsNoTracking();
 
@@ -40,11 +40,11 @@ namespace CommerceApi.DAL.Repositories
                 query = query.Include(include);
             }
 
-            return await query.FirstOrDefaultAsync(predicate);
+            return await query.FirstOrDefaultAsync(filter);
         }
 
 
-        public async Task<ICollection<TEntity>> GetAllByQuery(params Expression<Func<TEntity, object>>[] includes)
+        public async Task<ICollection<TEntity>> GetAllByQuery(Expression<Func<TEntity, bool>>? predicate = null, params Expression<Func<TEntity, object>>[] includes)
         {
             IQueryable<TEntity> query = _context.Set<TEntity>().AsNoTracking();
 
@@ -53,17 +53,14 @@ namespace CommerceApi.DAL.Repositories
                 query = query.Include(include);
             }
 
-            return await query.ToListAsync();
+            if (predicate is null)
+                return await query.Where(e => e != null).ToListAsync();
+
+            return await query.Where(predicate).ToListAsync();
         }
 
         public async Task<TEntity> Update(TEntity entity)
         {
-            //TEntity foundEntity = await _context.Set<TEntity>().FindAsync(id);
-
-            //_context.Set<TEntity>().Entry(foundEntity).CurrentValues.SetValues(entity);
-            //await _context.SaveChangesAsync();
-
-            //return foundEntity;
             _ = _context.Set<TEntity>().Update(entity);
 
             await _context.SaveChangesAsync();
