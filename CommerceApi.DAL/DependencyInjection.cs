@@ -11,7 +11,7 @@ namespace CommerceApi.DAL
         public static void RegisterDALDependencies(this IServiceCollection services, IConfiguration Configuration)
         {
             services.AddScoped<ICartRepository, CartRepository>();
-            services.AddScoped<IItemRepository, ItemRepository>();
+            services.AddScoped<IProductRepository, ProductRepository>();
 
             services.AddDbContext<DataContext>(options =>
             {
