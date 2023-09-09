@@ -5,7 +5,7 @@ namespace CommerceApi.DTO.DTOS
     public class ProductDto
     {
         [JsonPropertyName("product_id")]
-        public int ProductId { get; set; }
+        public string ProductId { get; set; }
 
         public string Name { get; set; }
         
@@ -13,7 +13,7 @@ namespace CommerceApi.DTO.DTOS
         
         public string Description { get; set; }
         
-        public byte[]? Image { get; set; }
+        //public byte[]? Image { get; set; }
         
         public int Count { get; set; }
 
