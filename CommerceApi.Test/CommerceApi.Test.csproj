@@ -25,6 +25,7 @@
 
 
 	<ItemGroup>
+		<ProjectReference Include="..\CommerceApi.API\CommerceApi.API.csproj" />
 		<ProjectReference Include="..\CommerceApi.BLL\CommerceApi.BLL.csproj" />
 		<ProjectReference Include="..\CommerceApi.DAL\CommerceApi.DAL.csproj" />
 	</ItemGroup>
