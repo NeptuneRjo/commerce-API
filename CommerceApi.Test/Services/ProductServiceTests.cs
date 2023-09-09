@@ -1,19 +1,16 @@
 ﻿using AutoMapper;
 using CommerceApi.BLL.Services;
 using CommerceApi.BLL.Utilities;
-using CommerceApi.BLL.Utilities.CustomExceptions;
 using CommerceApi.DAL.Entities;
 using CommerceApi.DAL.Repositories;
 using CommerceApi.DTO.DTOS;
 using Microsoft.Extensions.Logging;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ClientProtocol;
 using NSubstitute;
-using System.Linq.Expressions;
 using Xunit.Abstractions;
 
 namespace CommerceApi.Test.Services
 {
-    public class ProductServiceTests
+    public class ProductServiceTests : TestUtilities
     {
         private readonly ITestOutputHelper _output;
 
@@ -22,14 +19,10 @@ namespace CommerceApi.Test.Services
         private readonly ILogger<ProductService> _logger;
         private readonly IMapper _mapper;
 
-        private const string ProductId = "PROD_12345";
-        private readonly Product _productEntity;
-        private readonly ProductToAddDto _productToAddDto;
-        private readonly ProductToUpdateDto _productToUpdateDto;
-        private readonly ProductDto _productDto;
-
         public ProductServiceTests(ITestOutputHelper output)
         {
+            _output = output;
+
             _repository = Substitute.For<IProductRepository>();
             _logger = Substitute.For<ILogger<ProductService>>();
 
@@ -39,59 +32,6 @@ namespace CommerceApi.Test.Services
             _mapper = new Mapper(configuration);
 
             _service = new ProductService(_repository, _mapper, _logger);
-
-            _productEntity = new Product()
-            {
-                ProductId = ProductId,
-                Name = "ProductEntityName",
-                Description = "ProductEntityDesc",
-                Price = 0,
-                StockQuantity = 0,
-                Brand = "ProductEntityBrand",
-                ProductReviews = new List<ProductReview>(),
-                CreatedAt = DateTime.Now,
-                UpdatedAt = DateTime.Now,
-            };
-
-            _productDto = new ProductDto()
-            {
-                ProductId = ProductId,
-                Name = "ProductEntityName",
-                Description = "ProductEntityDesc",
-                Price = 0,
-                StockQuantity = 0,
-                Brand = "ProductEntityBrand",
-                ProductReviews = new List<ProductReviewDto>(),
-                CreatedAt = DateTime.Now,
-                UpdatedAt = DateTime.Now,
-            };
-
-            _productToAddDto = new ProductToAddDto()
-            {
-                Name = "ProductToAddName",
-                Description = "ProductToAddDesc",
-                Price = 0,
-                Category = "ProductToAddCat",
-                Brand = "ProductToAddBrand",
-                StockQuantity = 0,
-                InStock = false,
-                Currency = "ProductToAddCur"
-            };
-
-            _productToUpdateDto = new ProductToUpdateDto()
-            {
-                ProductId = ProductId,
-                Name = "ProductToUpdateName",
-                Description = "ProductToUpdateDesc",
-                Price = 0,
-                Category = "ProductToUpdateCat",
-                Brand = "ProductToUpdateBrand",
-                StockQuantity = 0,
-                InStock = false,
-                Currency = "ProductToUpdateCur"
-            };
-
-            _output = output;
         }
 
         [Fact]
