@@ -2,7 +2,7 @@
 using CommerceApi.DAL.Entities;
 using CommerceApi.DAL.Repositories;
 using CommerceApi.DTO.DTOS;
-using CommerceApi.BLL.Utilities.CustomExceptions;
+using CommerceApi.BLL.Utilities;
 using Microsoft.Extensions.Logging;
 using System.Linq.Expressions;
 
@@ -37,7 +37,6 @@ namespace CommerceApi.BLL.Services
             Expression<Func<Product, bool>> query = e => e.ProductId == id;
             Expression<Func<Product, object>>[] includes = { e => e.ProductReviews };
 
-            //Product product = await _repository.GetByQuery(query);
             Product product = await _repository.GetProductAsync(id);
 
             if (product is null)
