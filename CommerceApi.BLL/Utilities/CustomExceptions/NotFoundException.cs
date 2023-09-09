@@ -1,4 +1,4 @@
-﻿namespace CommerceApi.BLL.Utilities.CustomExceptions
+﻿namespace CommerceApi.BLL.Utilities
 {
     public class NotFoundException : Exception
     {
