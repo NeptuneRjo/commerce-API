@@ -5,7 +5,7 @@
 namespace CommerceApi.DAL.Migrations
 {
     /// <inheritdoc />
-    public partial class TempDisableImage : Migration
+    public partial class AdditionalUids : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
