@@ -4,8 +4,9 @@ namespace CommerceApi.DAL.Entities
 {
     public class WishList
     {
-        [Key]
-        public string WishListId { get; set; }
+        public int Id { get; set; }
+
+        public string UID { get; set; }
 
         public int TotalItems { get; set; }
 
@@ -15,7 +16,7 @@ namespace CommerceApi.DAL.Entities
 
         public ICollection<WishListProduct> WishListProducts { get; set; }
 
-        public string UserId { get; set; }
+        public int UserId { get; set; }
         public User User { get; set; }
     }
 }

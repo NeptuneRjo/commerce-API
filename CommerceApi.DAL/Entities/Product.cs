@@ -5,8 +5,9 @@ namespace CommerceApi.DAL.Entities
 {
     public class Product
     {
-        [Key]
-        public string ProductId { get; set; }
+        public int Id { get; set; }
+
+        public string UID { get; set; }
 
         [Required, MaxLength(65)]
         public string Name { get; set; }

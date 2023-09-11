@@ -4,8 +4,9 @@ namespace CommerceApi.DAL.Entities
 {
     public class Review
     {
-        [Key]
-        public string ReviewId { get; set; }
+        public int Id { get; set; }
+
+        public string UID { get; set; }
 
         [Required, MaxLength(255)]
         public string Content { get; set; }

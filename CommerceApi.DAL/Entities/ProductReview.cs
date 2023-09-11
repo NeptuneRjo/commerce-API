@@ -4,9 +4,9 @@ namespace CommerceApi.DAL.Entities
 {
     public class ProductReview
     {
-        public string ProductId { get; set; }
+        public int ProductId { get; set; }
 
-        public string ReviewId { get; set; }
+        public int ReviewId { get; set; }
 
         public Review Review { get; set; }
 
