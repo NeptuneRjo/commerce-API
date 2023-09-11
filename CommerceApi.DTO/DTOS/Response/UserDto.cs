@@ -5,7 +5,7 @@ namespace CommerceApi.DTO.DTOS
     public class UserDto
     {
         [JsonPropertyName("user_id")]
-        public int UserId { get; set; }
+        public string UID { get; set; }
 
         public string Email { get; set; }
 

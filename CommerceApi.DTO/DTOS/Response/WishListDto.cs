@@ -10,7 +10,7 @@ namespace CommerceApi.DTO.DTOS
     public class WishListDto
     {
         [JsonPropertyName("wishlist_id")]
-        public int WishListId { get; set; }
+        public string UID { get; set; }
 
         [JsonPropertyName("total_items")]
         public int TotalItems { get; set; }

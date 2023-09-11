@@ -5,7 +5,7 @@ namespace CommerceApi.DTO.DTOS
     public class ProductDto
     {
         [JsonPropertyName("product_id")]
-        public string ProductId { get; set; }
+        public string UID { get; set; }
 
         public string Name { get; set; }
         
