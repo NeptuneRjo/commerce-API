@@ -1,75 +1,50 @@
 ﻿using AutoMapper;
-using CommerceApi.DAL.Repositories;
+using CommerceApi.BLL.Utilities;
 using System.Linq.Expressions;
 
 namespace CommerceApi.BLL.Services
 {
-    public class GenericService<TEntity> : IGenericService<TEntity> where TEntity : class
+    public class GenericService<TEntity> : IGenericService<TEntity>
     {
-        private TEntity _entity;
-        private IList<TEntity> _entities;
+        private IMapper _mapper;
+        private IGenericOperations<TEntity> _ops;
 
-        private readonly IGenericRepository<TEntity> _repository;
-        private readonly IMapper _mapper;
-
-        public GenericService(IGenericRepository<TEntity> repository, IMapper mapper)
+        public GenericService(IMapper mapper, IGenericOperations<TEntity> ops)
         {
-            _repository = repository;
             _mapper = mapper;
+            _ops = ops;
         }
 
-        public async Task<IGenericService<TEntity>> GetEntitiesAsync()
-        {
-            _entities = (IList<TEntity>)await _repository.GetAll();
+        public async Task<ICollection<TEntity>> GetEntitiesAsync() => 
+            await _ops.RetrieveEntitiesOperation();
 
-            return this;
-        }
+        public async Task<ICollection<TDestination>> GetEntitiesAsync<TDestination>() => 
+            _mapper.Map<ICollection<TDestination>>(await _ops.RetrieveEntitiesOperation());
 
-        public async Task<IGenericService<TEntity>> GetEntityAsync(Expression<Func<TEntity, bool>> filter, Expression<Func<TEntity, object>>[] includes)
-        {
-            _entity = await _repository.GetByQuery(filter, includes);
+        public async Task<TEntity> GetEntityAsync(
+            Expression<Func<TEntity, bool>> filter, 
+            Expression<Func<TEntity, object>>[]? includes = null
+            ) => await _ops.RetrieveEntityOperation(filter, includes);
 
-            return this;
-        }
+        public async Task<TDestination> GetEntityAsync<TDestination>(
+            Expression<Func<TEntity, bool>> filter,
+            Expression<Func<TEntity, object>>[]? includes = null
+            ) => _mapper.Map<TDestination>(await _ops.RetrieveEntityOperation(filter, includes));
 
-        public async Task<IGenericService<TEntity>> AddEntityAsync(TEntity entity)
-        {
-            _entity = await _repository.Add(entity);
+        public async Task DeleteEntityAsync(Expression<Func<TEntity, bool>> filter) =>
+            await _ops.DeleteEntityOperation(filter);
 
-            return this;
-        }
+        public async Task<TEntity> AddEntityAsync(TEntity entity) =>
+            await _ops.AddEntityOperation(entity);
 
-        public async Task<IGenericService<TEntity>> AddEntitiesAsync(IList<TEntity> entities)
-        {
-            _entities = (IList<TEntity>)await _repository.AddRange(entities);
+        public async Task<TDestination> AddEntityAsync<TDestination>(TEntity entity) =>
+            _mapper.Map<TDestination>(await _ops.AddEntityOperation(entity));
 
-            return this;
-        }
+        public async Task<TEntity> UpdateEntityAsync(Expression<Func<TEntity, bool>> filter, TEntity entity) =>
+            await _ops.UpdateEntityOperation(filter, entity);
 
-        public async Task<IGenericService<TEntity>> UpdateEntityAsync(TEntity entity)
-        {
-            _entity = await _repository.Update(entity);
+        public async Task<TDestination> UpdateEntityAsync<TDestination>(Expression<Func<TEntity, bool>> filter, TEntity entity) =>
+            _mapper.Map<TDestination>(await _ops.UpdateEntityOperation(filter, entity));
 
-            return this;
-        }
-
-        public async Task DeleteEntityAsync(TEntity entity)
-        {
-            await _repository.Delete(entity);
-        }
-
-        public IGenericService<TEntity> MapEntities<TSource, TDestination>(IList<TSource> sourceList)
-        {
-            _entities = _mapper.Map<IList<TEntity>>(sourceList);
-
-            return this;
-        }
-
-        public IGenericService<TEntity> MapEntity<TSource, TDestination>(TSource source)
-        {
-            _entity = _mapper.Map<TEntity>(source);
-
-            return this;
-        }
     }
 }

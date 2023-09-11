@@ -15,7 +15,6 @@ namespace CommerceApi.DAL
 
             services.AddDbContext<DataContext>(options =>
             {
-                var azureConnectionString = Configuration.GetConnectionString("AZURE_SQL_CONNECTIONSTRING");
                 var defaultConnectionString = Configuration.GetConnectionString("DefaultConnection");
                 options.UseSqlServer(defaultConnectionString);
             });
