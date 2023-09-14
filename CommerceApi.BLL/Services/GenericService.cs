@@ -19,38 +19,35 @@ namespace CommerceApi.BLL.Services
             _logger = logger;
         }
 
-        public async Task<ICollection<TEntity>> GetEntitiesAsync() =>
-            await _repository.GetAll();
-
-        public async Task<ICollection<TDestination>> GetEntitiesAsync<TDestination>() =>
-            _mapper.Map<ICollection<TDestination>>(await _repository.GetAll());
-
-        public async Task<TEntity> GetEntityAsync(Expression<Func<TEntity, bool>> filter, Expression<Func<TEntity, object>>[]? includes = null)
+        public async Task<object> GetEntitiesAsync(Type? destinationType = null)
         {
-            _logger.LogInformation($"{nameof(TEntity)} entity was requested");
-            var result = await _repository.GetByQuery(filter, includes);
+            var result = await _repository.GetAll();
 
-            if (result is null)
-            {
-                _logger.LogError($"{nameof(TEntity)} was not found");
-                throw new NotFoundException();
-            }
+            if (destinationType != null)
+                return _mapper.Map(result, destinationType);
 
             return result;
         }
 
-        public async Task<TDestination> GetEntityAsync<TDestination>(Expression<Func<TEntity, bool>> filter, Expression<Func<TEntity, object>>[]? includes = null)
+        public async Task<object> GetEntityAsync(
+            Expression<Func<TEntity, bool>> filter, 
+            Expression<Func<TEntity, object>>[]? includes = null, 
+            Type? destinationType = null
+            )
         {
             _logger.LogInformation($"{nameof(TEntity)} entity was requested");
             var result = await _repository.GetByQuery(filter, includes);
 
-            if (result is null)
+            if (result == null)
             {
                 _logger.LogError($"{nameof(TEntity)} was not found");
                 throw new NotFoundException();
             }
 
-            return _mapper.Map<TDestination>(result);
+            if (destinationType != null)
+                return _mapper.Map(result, destinationType);
+
+            return result;
         }
 
         public async Task DeleteEntityAsync(Expression<Func<TEntity, bool>> filter)
@@ -67,6 +64,29 @@ namespace CommerceApi.BLL.Services
             await _repository.Delete(result);
         }
 
+        public async Task<object> AddEntityAsync(TEntity entity, Type? destinationType = null)
+        {
+            var result = await _repository.Add(entity);
+
+            _logger.LogInformation($"Product with the properties: {result} was added");
+
+            if (destinationType != null)
+                return _mapper.Map(result,destinationType);
+
+            return result;
+        }
+
+        public async Task<object> UpdateEntityAsync(TEntity entity, Type? destinationType = null)
+        {
+            var result = await _repository.Update(entity);
+
+            _logger.LogInformation($"Product with these properties: {result} has been updated");
+
+            if (destinationType != null)
+                return _mapper.Map(result, destinationType);
+
+            return result;
+        }
 
     }
 }
