@@ -1,92 +1,50 @@
 ﻿using AutoMapper;
 using CommerceApi.BLL.Utilities;
-using CommerceApi.DAL.Repositories;
-using Microsoft.Extensions.Logging;
 using System.Linq.Expressions;
 
 namespace CommerceApi.BLL.Services
 {
     public class GenericService<TEntity> : IGenericService<TEntity>
     {
-        private IGenericRepository<TEntity> _repository;
-        private ILogger _logger;
         private IMapper _mapper;
+        private IGenericOperations<TEntity> _ops;
 
-        public GenericService(IGenericRepository<TEntity> repository, ILogger logger, IMapper mapper)
+        public GenericService(IMapper mapper, IGenericOperations<TEntity> ops)
         {
-            _repository = repository;
             _mapper = mapper;
-            _logger = logger;
+            _ops = ops;
         }
 
-        public async Task<object> GetEntitiesAsync(Type? destinationType = null)
-        {
-            var result = await _repository.GetAll();
+        public async Task<ICollection<TEntity>> GetEntitiesAsync() => 
+            await _ops.RetrieveEntitiesOperation();
 
-            if (destinationType != null)
-                return _mapper.Map(result, destinationType);
+        public async Task<ICollection<TDestination>> GetEntitiesAsync<TDestination>() => 
+            _mapper.Map<ICollection<TDestination>>(await _ops.RetrieveEntitiesOperation());
 
-            return result;
-        }
-
-        public async Task<object> GetEntityAsync(
+        public async Task<TEntity> GetEntityAsync(
             Expression<Func<TEntity, bool>> filter, 
-            Expression<Func<TEntity, object>>[]? includes = null, 
-            Type? destinationType = null
-            )
-        {
-            _logger.LogInformation($"{nameof(TEntity)} entity was requested");
-            var result = await _repository.GetByQuery(filter, includes);
+            Expression<Func<TEntity, object>>[]? includes = null
+            ) => await _ops.RetrieveEntityOperation(filter, includes);
 
-            if (result == null)
-            {
-                _logger.LogError($"{nameof(TEntity)} was not found");
-                throw new NotFoundException();
-            }
+        public async Task<TDestination> GetEntityAsync<TDestination>(
+            Expression<Func<TEntity, bool>> filter,
+            Expression<Func<TEntity, object>>[]? includes = null
+            ) => _mapper.Map<TDestination>(await _ops.RetrieveEntityOperation(filter, includes));
 
-            if (destinationType != null)
-                return _mapper.Map(result, destinationType);
+        public async Task DeleteEntityAsync(Expression<Func<TEntity, bool>> filter) =>
+            await _ops.DeleteEntityOperation(filter);
 
-            return result;
-        }
+        public async Task<TEntity> AddEntityAsync(TEntity entity) =>
+            await _ops.AddEntityOperation(entity);
 
-        public async Task DeleteEntityAsync(Expression<Func<TEntity, bool>> filter)
-        {
-            _logger.LogInformation($"{nameof(TEntity)} entity was requested");
-            var result = await _repository.GetByQuery(filter);
+        public async Task<TDestination> AddEntityAsync<TDestination>(TEntity entity) =>
+            _mapper.Map<TDestination>(await _ops.AddEntityOperation(entity));
 
-            if (result is null)
-            {
-                _logger.LogError($"{nameof(TEntity)} was not found");
-                throw new NotFoundException();
-            }
+        public async Task<TEntity> UpdateEntityAsync(TEntity entity) =>
+            await _ops.UpdateEntityOperation(entity);
 
-            await _repository.Delete(result);
-        }
-
-        public async Task<object> AddEntityAsync(TEntity entity, Type? destinationType = null)
-        {
-            var result = await _repository.Add(entity);
-
-            _logger.LogInformation($"Product with the properties: {result} was added");
-
-            if (destinationType != null)
-                return _mapper.Map(result,destinationType);
-
-            return result;
-        }
-
-        public async Task<object> UpdateEntityAsync(TEntity entity, Type? destinationType = null)
-        {
-            var result = await _repository.Update(entity);
-
-            _logger.LogInformation($"Product with these properties: {result} has been updated");
-
-            if (destinationType != null)
-                return _mapper.Map(result, destinationType);
-
-            return result;
-        }
+        public async Task<TDestination> UpdateEntityAsync<TDestination>(TEntity entity) =>
+            _mapper.Map<TDestination>(await _ops.UpdateEntityOperation(entity));
 
     }
 }
