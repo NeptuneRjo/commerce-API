@@ -16,7 +16,10 @@ namespace CommerceApi.BLL.Services
         /// <param name="includes"></param>
         /// <param name="destinationType"></param>
         /// <returns>The found <see cref="TEntity"/>, mapped if destination is included. </returns>
-        Task<object> GetEntityAsync(Expression<Func<TEntity, bool>> filter, Expression<Func<TEntity, object>>[]? includes = null, Type? destinationType = null);
+        Task<TEntity> GetEntityAsync(Expression<Func<TEntity, bool>> filter, Expression<Func<TEntity, object>>[]? includes = null);
+        Task<TDestination> GetEntityAsync<TDestination>(Expression<Func<TEntity, bool>> filter, Expression<Func<TEntity, object>>[]? includes = null);
+
+
 
         /// <summary>
         /// Retrieve a collection of entities.
@@ -25,7 +28,9 @@ namespace CommerceApi.BLL.Services
         /// </summary>
         /// <param name="destinationType"></param>
         /// <returns>The collection of found <see cref="TEntity"/>, mapped if destination is included</returns>
-        Task<object> GetEntitiesAsync(Type? destinationType = null);
+        Task<ICollection<TEntity>> GetEntitiesAsync();
+        Task<ICollection<TDestination>> GetEntitiesAsync<TDestination>();
+
 
         /// <summary>
         /// Delete the first entity found by the query.
@@ -42,7 +47,8 @@ namespace CommerceApi.BLL.Services
         /// <param name="entity"></param>
         /// <param name="destinationType"></param>
         /// <returns>The added <see cref="TEntity"/>, mapped if destination type is included</returns>
-        Task<object> AddEntityAsync(TEntity entity, Type? destinationType = null);
+        Task<TEntity> AddEntityAsync(TEntity entity);
+        Task<TDestination> AddEntityAsync<TDestination>(TEntity entity);
 
         /// <summary>
         /// Update the entity
@@ -52,7 +58,9 @@ namespace CommerceApi.BLL.Services
         /// <param name="entity"></param>
         /// <param name="destinationType"></param>
         /// <returns>The updated <see cref="TEntity"/>, mapped if destination type is included.</returns>
-        Task<object> UpdateEntityAsync(TEntity entity, Type? destinationType = null);
+        Task<TEntity> UpdateEntityAsync(TEntity entity);
+        Task<TDestination> UpdateEntityAsync<TDestination>(TEntity entity);
+
     }
 }
 
