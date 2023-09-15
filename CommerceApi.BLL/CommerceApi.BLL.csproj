@@ -16,4 +16,8 @@
     <ProjectReference Include="..\CommerceApi.DTO\CommerceApi.DTO.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="NewFolder\" />
+  </ItemGroup>
+
 </Project>
