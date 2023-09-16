@@ -13,7 +13,7 @@ namespace CommerceApi.BLL.Utilities
 
         Task<ICollection<TEntity>> RetrieveEntitiesOperation();
 
-        Task<TEntity> UpdateEntityOperation(TEntity entity);
+        Task<TEntity> UpdateEntityOperation(Expression<Func<TEntity, bool>> filter, TEntity entity);
 
         Task DeleteEntityOperation(Expression<Func<TEntity, bool>> filter);
 

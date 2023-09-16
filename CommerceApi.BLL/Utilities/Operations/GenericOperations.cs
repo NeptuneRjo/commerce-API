@@ -20,7 +20,7 @@ namespace CommerceApi.BLL.Utilities
             _logger.LogInformation($"{nameof(TEntity)} entity was requested");
             var result = await _repository.GetByQuery(filter);
 
-            if (result is null)
+            if (result == null)
             {
                 _logger.LogError($"{nameof(TEntity)} was not found");
                 throw new NotFoundException();
@@ -38,13 +38,25 @@ namespace CommerceApi.BLL.Utilities
             return result;
         }
 
-        public async Task<TEntity> UpdateEntityOperation(TEntity entity)
+        public async Task<TEntity> UpdateEntityOperation(
+            Expression<Func<TEntity, bool>> filter, 
+            TEntity entity
+            )
         {
-            var result = await _repository.Update(entity);
+            _logger.LogInformation($"{nameof(TEntity)} entity was requested");
+            var result = await _repository.GetByQuery(filter);
 
-            _logger.LogInformation($"Product with these properties: {result} has been updated");
+            if (result == null)
+            {
+                _logger.LogError($"{nameof(TEntity)} was not found");
+                throw new NotFoundException();
+            }
 
-            return result;
+            var updatedResult = await _repository.Update(entity);
+
+            _logger.LogInformation($"Product with these properties: {updatedResult} has been updated");
+
+            return updatedResult;
         }
 
         public async Task<TEntity> RetrieveEntityOperation(
@@ -64,11 +76,7 @@ namespace CommerceApi.BLL.Utilities
             return result;
         }
 
-        public async Task<ICollection<TEntity>> RetrieveEntitiesOperation()
-        {
-            var result = await _repository.GetAll();
-
-            return result;
-        }
+        public async Task<ICollection<TEntity>> RetrieveEntitiesOperation() =>
+            await _repository.GetAll();
     }
 }
