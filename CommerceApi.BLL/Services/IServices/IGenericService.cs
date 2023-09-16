@@ -58,8 +58,8 @@ namespace CommerceApi.BLL.Services
         /// <param name="entity"></param>
         /// <param name="destinationType"></param>
         /// <returns>The updated <see cref="TEntity"/>, mapped if destination type is included.</returns>
-        Task<TEntity> UpdateEntityAsync(TEntity entity);
-        Task<TDestination> UpdateEntityAsync<TDestination>(TEntity entity);
+        Task<TEntity> UpdateEntityAsync(Expression<Func<TEntity, bool>> filter, TEntity entity);
+        Task<TDestination> UpdateEntityAsync<TDestination>(Expression<Func<TEntity, bool>> filter, TEntity entity);
 
     }
 }

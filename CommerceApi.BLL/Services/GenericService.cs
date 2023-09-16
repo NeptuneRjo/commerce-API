@@ -40,11 +40,11 @@ namespace CommerceApi.BLL.Services
         public async Task<TDestination> AddEntityAsync<TDestination>(TEntity entity) =>
             _mapper.Map<TDestination>(await _ops.AddEntityOperation(entity));
 
-        public async Task<TEntity> UpdateEntityAsync(TEntity entity) =>
-            await _ops.UpdateEntityOperation(entity);
+        public async Task<TEntity> UpdateEntityAsync(Expression<Func<TEntity, bool>> filter, TEntity entity) =>
+            await _ops.UpdateEntityOperation(filter, entity);
 
-        public async Task<TDestination> UpdateEntityAsync<TDestination>(TEntity entity) =>
-            _mapper.Map<TDestination>(await _ops.UpdateEntityOperation(entity));
+        public async Task<TDestination> UpdateEntityAsync<TDestination>(Expression<Func<TEntity, bool>> filter, TEntity entity) =>
+            _mapper.Map<TDestination>(await _ops.UpdateEntityOperation(filter, entity));
 
     }
 }
