@@ -17,7 +17,7 @@ namespace CommerceApi.Test.Operations
 
         private readonly IGenericOperations<MockEntity> _ops;
         private readonly IGenericRepository<MockEntity> _repository;
-        private readonly ILogger<GenericService<MockEntity>> _logger;
+        private readonly ILogger<GenericOperations<MockEntity>> _logger;
 
         private readonly Expression<Func<MockEntity, bool>> _queryById;
         private readonly Expression<Func<MockEntity, bool>> _queryByName;
@@ -28,7 +28,7 @@ namespace CommerceApi.Test.Operations
         {
             _output = output;
             _repository = Substitute.For<IGenericRepository<MockEntity>>();
-            _logger = Substitute.For<ILogger<GenericService<MockEntity>>>();
+            _logger = Substitute.For<ILogger<GenericOperations<MockEntity>>>();
 
             _ops = new GenericOperations<MockEntity>(_repository, _logger);
 
