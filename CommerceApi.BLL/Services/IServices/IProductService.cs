@@ -1,17 +1,23 @@
-﻿using CommerceApi.DTO.DTOS;
+﻿using CommerceApi.DAL.Entities;
+using CommerceApi.DTO.DTOS;
 
 namespace CommerceApi.BLL.Services
 {
-    public interface IProductService
+    public interface IProductService : IGenericService<Product>
     {
-        Task<ICollection<ProductDto>> GetProductsAsync();
-
-        Task<ProductDto> GetProductAsync(string id);
-
-        Task<ProductDto> AddProductAsync(ProductToAddDto productToAddDto);
-
-        Task<ProductDto> UpdateProductAsync(ProductToUpdateDto productToUpdateDto);
-
-        Task DeleteProductAsync(string id);
+        /// <summary>
+        /// Add the product
+        /// </summary>
+        /// <param name="productToAdd"></param>
+        /// <returns>The added <see cref="ProductDto"/></returns>
+        Task<ProductDto> AddProductAsync(ProductToAddDto productToAdd);
+        
+        /// <summary>
+        /// Update the product
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="productToUpdate"></param>
+        /// <returns>The updated <see cref="ProductDto"/></returns>
+        Task<ProductDto> UpdateProductAsync(string id, ProductToUpdateDto productToUpdate);
     }
 }
