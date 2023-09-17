@@ -2,8 +2,7 @@
 
 namespace CommerceApi.DAL.Repositories
 {
-    public interface ICartRepository : IGenericRepository<Cart>
+    public interface ICartProductRepository : IGenericRepository<CartProduct>
     {
-
     }
 }

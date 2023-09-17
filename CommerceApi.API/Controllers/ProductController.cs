@@ -1,8 +1,10 @@
 ﻿using CommerceApi.BLL.Services;
 using CommerceApi.BLL.Utilities;
+using CommerceApi.DAL.Entities;
 using CommerceApi.DTO.DTOS;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Linq.Expressions;
 
 namespace CommerceApi.Controllers
 {
@@ -11,8 +13,8 @@ namespace CommerceApi.Controllers
     public class ProductController : ControllerBase
     {
         private readonly IProductService _service;
-
-        private ObjectResult NotFoundMsg(string id) => NotFound($"Product with the ProductId = {id} was not found");
+        
+        private Expression<Func<Product, object>>[] includes = { e => e.ProductReviews };
 
         public ProductController(IProductService service)
         {
@@ -23,7 +25,7 @@ namespace CommerceApi.Controllers
         {
             try
             {
-                return Ok(await _service.GetProductsAsync());
+                return Ok(await _service.GetEntitiesAsync<ICollection<ProductDto>>());
             }
             catch (Exception)
             {
@@ -50,11 +52,11 @@ namespace CommerceApi.Controllers
         {
             try
             {
-                return Ok(await _service.GetProductAsync(id));
+                return Ok(await _service.GetEntityAsync<ProductDto>(e => e.UID == id, includes));
             }
             catch (NotFoundException)
             {
-                return NotFoundMsg(id);
+                return NotFound($"Product with the ProductId = {id} was not found");
             }
             catch (Exception)
             { 
@@ -69,16 +71,16 @@ namespace CommerceApi.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            if (id != update.ProductId)
+            if (id != update.UID)
                 return BadRequest("Id does not match request body");
 
             try
             {
-                return Ok(await _service.UpdateProductAsync(update));
+                return Ok(await _service.UpdateProductAsync(id, update));
             }
             catch (NotFoundException)
             {
-                return NotFoundMsg(id);
+                return NotFound($"Product with the ProductId = {id} was not found");
             }
             catch (Exception)
             {
@@ -92,12 +94,12 @@ namespace CommerceApi.Controllers
         {
             try
             {
-                await _service.DeleteProductAsync(id);
+                await _service.DeleteEntityAsync(e => e.UID == id);
                 return Ok($"Product with the ProductId = {id} was successfully deleted");
             }
             catch (NotFoundException)
             {
-                return NotFoundMsg(id);
+                return NotFound($"Product with the ProductId = {id} was not found");
             }
             catch (Exception)
             {
