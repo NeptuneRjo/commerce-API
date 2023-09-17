@@ -16,8 +16,8 @@ namespace CommerceApi.BLL.Services
         /// <param name="includes"></param>
         /// <param name="destinationType"></param>
         /// <returns>The found <see cref="TEntity"/>, mapped if destination is included. </returns>
-        Task<TEntity> GetEntityAsync(Expression<Func<TEntity, bool>> filter, Expression<Func<TEntity, object>>[]? includes = null);
-        Task<TDestination> GetEntityAsync<TDestination>(Expression<Func<TEntity, bool>> filter, Expression<Func<TEntity, object>>[]? includes = null);
+        Task<TEntity> GetEntityAsync(Expression<Func<TEntity, bool>> filter, Expression<Func<TEntity, object>>[]? includes);
+        Task<TDestination> GetEntityAsync<TDestination>(Expression<Func<TEntity, bool>> filter, Expression<Func<TEntity, object>>[]? includes);
 
 
 
