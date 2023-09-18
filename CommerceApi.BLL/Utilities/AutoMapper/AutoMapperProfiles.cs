@@ -9,6 +9,7 @@ namespace CommerceApi.BLL.Utilities
         public AutoMapperProfiles()
         {
             CreateMap<Cart,  CartDto>();
+            CreateMap<CartDto, Cart>();
             CreateMap<CartProduct, CartProductDto>();
             CreateMap<Product, ProductDto>();
             CreateMap<ProductReview, ProductReviewDto>();
