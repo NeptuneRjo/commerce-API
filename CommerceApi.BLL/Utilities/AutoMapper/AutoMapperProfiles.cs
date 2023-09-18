@@ -11,6 +11,7 @@ namespace CommerceApi.BLL.Utilities
             CreateMap<Cart,  CartDto>();
             CreateMap<CartDto, Cart>();
             CreateMap<CartProduct, CartProductDto>();
+            CreateMap<CartProductToAddDto, CartProduct>();
             CreateMap<Product, ProductDto>();
             CreateMap<ProductReview, ProductReviewDto>();
             CreateMap<ProductToAddDto, Product>();
