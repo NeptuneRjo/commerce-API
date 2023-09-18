@@ -1,15 +1,21 @@
 ﻿using CommerceApi.BLL.Services;
+using CommerceApi.BLL.Utilities;
+using CommerceApi.DAL.Entities;
 using CommerceApi.DTO.DTOS;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Linq.Expressions;
 
 namespace CommerceApi.API.Controllers
 {
 
     [ApiController]
-    [Route("v1/cart")]
+    [Route("api/cart")]
     public class CartController : ControllerBase
     {
         private readonly ICartService _service;
+
+        private Expression<Func<Cart, object>>[] includes = { e => e.CartProducts };
 
         public CartController(ICartService service)
         {
@@ -17,61 +23,35 @@ namespace CommerceApi.API.Controllers
         }
 
         // GET: v1/cart/{cart_id}
-        // Takes Public or Secret Key
         [HttpGet("{cartId}")]
-        public ActionResult GetCart(int cartId)
+        public async Task<IActionResult> GetCart(string cartId)
         {
             try
             {
-                string key = Request.Headers["X-Authorization"];
-
-                CartDto dto = _service.GetCart(key, cartId);
-
-                return Ok(dto);
+                return Ok(await _service.GetEntityAsync<CartDto>(e => e.UID == cartId, includes));
+            }
+            catch (NotFoundException)
+            {
+                return NotFound($"Cart with the id = {cartId} was not found");
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
-            }
-        }
-
-        // POST: v1/cart/{cart_id}
-        // Takes Public or Secret Key
-        [HttpPost("{cartId}")]
-        public ActionResult AddItemToCart(int cartId, [FromBody] string body)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest();
-
-            try
-            {
-                string key = Request.Headers["X-Authorization"];
-
-                //CartDto dto = _service.AddItemToCart(key, cartId, body);
-
-                return Ok();
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
+                return BadRequest("Something went wrong");
             }
         }
 
         // DELETE: v1/cart/{cart_id}
-        // Takes Public or Secret Key
-        [HttpDelete("{cartId}")]
-        public ActionResult DeleteCart(int cartId)
+        [HttpDelete("{cartId}"), Authorize]
+        public async Task<IActionResult> DeleteCart(string cartId)
         {
             try
             {
-                string key = Request.Headers["X-Authorization"];
-
-                bool deleted = _service.DeleteCart(key, cartId);
-
-                if (!deleted)
-                    return BadRequest("Failed to delete cart");
-
-                return Ok();
+                await _service.DeleteEntityAsync(e => e.UID == cartId);
+                return Ok($"Cart with the id = {cartId} was successfully deleted");
+            }
+            catch (NotFoundException)
+            {
+                return NotFound($"Cart with the id = {cartId} was not found");
             }
             catch (Exception ex)
             {
@@ -79,41 +59,22 @@ namespace CommerceApi.API.Controllers
             }
         }
 
-        // DELETE: v1/cart/{cart_id}/items
-        // Takes Public or Secret Key
-        [HttpGet("{cartId}/empty")]
-        public ActionResult EmptyCart(int cartId)
+        [HttpPut("{cartId}"), Authorize]
+        public async Task<IActionResult> UpdateCart(string cartId, [FromBody] CartDto cartDto)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            if (cartId != cartDto.UID)
+                return BadRequest("Id does not match request body");
+
             try
             {
-                string key = Request.Headers["X-Authorization"];
-
-                CartDto dto = _service.EmptyCart(key, cartId);
-
-                return Ok(dto);
+                return Ok(await _service.UpdateCartAsync(cartId, cartDto));
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                return BadRequest(ex.Message);
-            }
-        }
-
-        // PUT: v1/cart/{cart_id}
-        // Takes Public or Secret Key
-        [HttpPut("{cartId}")]
-        public ActionResult UpdateItemInCart(int cartId, [FromBody] string body)
-        {
-            try
-            {
-                string key = Request.Headers["X-Authorization"];
-
-                //CartDto dto = _service.UpdateItemInCart(key, cartId, body);
-
-                return Ok();
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
+                return BadRequest("Something went wrong");
             }
         }
     }
