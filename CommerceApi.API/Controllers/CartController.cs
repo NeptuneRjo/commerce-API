@@ -13,13 +13,15 @@ namespace CommerceApi.API.Controllers
     [Route("api/cart")]
     public class CartController : ControllerBase
     {
-        private readonly ICartService _service;
+        private readonly ICartService _cartService;
+        private readonly ICartProductService _productService;
 
         private Expression<Func<Cart, object>>[] includes = { e => e.CartProducts };
 
-        public CartController(ICartService service)
+        public CartController(ICartService cartService, ICartProductService productService)
         {
-            _service = service;
+            _cartService = cartService;
+            _productService = productService;
         }
 
         // GET: v1/cart/{cart_id}
@@ -28,7 +30,7 @@ namespace CommerceApi.API.Controllers
         {
             try
             {
-                return Ok(await _service.GetEntityAsync<CartDto>(e => e.UID == cartId, includes));
+                return Ok(await _cartService.GetEntityAsync<CartDto>(e => e.UID == cartId, includes));
             }
             catch (NotFoundException)
             {
@@ -46,7 +48,7 @@ namespace CommerceApi.API.Controllers
         {
             try
             {
-                await _service.DeleteEntityAsync(e => e.UID == cartId);
+                await _cartService.DeleteEntityAsync(e => e.UID == cartId);
                 return Ok($"Cart with the id = {cartId} was successfully deleted");
             }
             catch (NotFoundException)
@@ -70,7 +72,27 @@ namespace CommerceApi.API.Controllers
 
             try
             {
-                return Ok(await _service.UpdateCartAsync(cartId, cartDto));
+                return Ok(await _cartService.UpdateCartAsync(cartId, cartDto));
+            }
+            catch (Exception)
+            {
+                return BadRequest("Something went wrong");
+            }
+        }
+
+        [HttpPost("{cartId}"), Authorize]
+        public async Task<IActionResult> AddProductToCart(string cartId, [FromBody] CartProductToAddDto productToAdd)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            if (cartId != productToAdd.CartId)
+                return BadRequest("Request url does not match the request body");
+
+            try
+            {
+                await _productService.AddCartProductAsync(cartId, productToAdd);
+                return Ok();
             }
             catch (Exception)
             {
