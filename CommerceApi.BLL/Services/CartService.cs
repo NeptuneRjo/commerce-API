@@ -16,11 +16,10 @@ namespace CommerceApi.BLL.Services
             _ops = ops;
         }
 
+        private async Task<Cart> MapUpdateToCart(string id, CartDto update) =>
+            _mapper.Map(update, await _ops.RetrieveEntityOperation(e => e.UID == id));
+
         public async Task<CartDto> UpdateCartAsync(string id, CartDto update) =>
-            _mapper.Map<CartDto>(
-                _ops.UpdateEntityOperation(e => e.UID == id, 
-                    // Map the dto to the entity
-                    _mapper.Map(update, 
-                        await _ops.RetrieveEntityOperation(e => e.UID == id))));
+            _mapper.Map<CartDto>(_ops.UpdateEntityOperation(e => e.UID == id, await MapUpdateToCart(id, update)));
     }
 }
